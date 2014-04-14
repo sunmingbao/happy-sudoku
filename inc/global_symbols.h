@@ -1,0 +1,75 @@
+/* 
+ * 本软件为免费、开源软件。
+ * 本软件的版权(包括源码及二进制发布版本)归一切公众所有。
+ * 您可以自由使用、传播本软件。
+ * 您也可以以任何形式、任何目的使用本软件(包括源码及二进制发布版本)，而不受任何版权限制。
+ * =====================
+ * 作者: 孙明保
+ * 邮箱: sunmingbao@126.com
+ */
+
+
+#ifndef __GLOBAL_SYMBOLS_H_
+#define __GLOBAL_SYMBOLS_H_
+
+#include <windows.h>
+#include "defs.h"
+
+
+
+extern HINSTANCE g_hInstance;
+extern int init_over;
+
+int register_frame();
+void set_frame_title(TCHAR *file_name);
+
+BOOL CALLBACK AboutDlgProc(HWND hDlg, UINT message,WPARAM wParam, LPARAM lParam);
+
+extern HWND    hwnd_frame;
+extern HWND hwndTip;
+extern int  doc_modified;
+void save_doc_file(TCHAR *file_name);
+void load_doc_file(TCHAR *file_name);
+
+
+extern HWND    hwnd_toolbar;
+extern int     toolbar_height;
+
+extern HWND    hwnd_statusbar;
+extern int     statusbar_height;
+
+
+int CreateToolbar();
+void set_toolbar_button(int id, int is_enabled);
+int CreateStatusBar();
+void update_statusbar();
+int create_windows(int iCmdShow);
+
+extern TCHAR szMainBoardWinClassName[];
+extern HWND    hwnd_main_board;
+
+int register_main_board_win();
+int stage_mode_begin();
+void SaveAsArch(char *file_path);
+void LoadArch(char *file_path);
+extern int display_help;
+extern int display_time;
+int register_grid_win();
+void unfocus_any_grid();
+void * grid_mark_str(int row, int col);
+void un_do();
+void re_do();
+int can_un_do();
+int can_re_do();
+void update_statusbar_time();
+void resize_window(HWND hwnd);
+
+int register_input_board_win();
+int register_input_grid_win();
+void display_input_win(int row, int col);
+void display_mark_win(int row, int col);
+void mov_input_win_to_grid(int row, int col);
+extern TCHAR szInputBoardWinClassName[] ;
+extern HWND    hwnd_input_board;
+#endif
+

@@ -1,0 +1,232 @@
+/* 
+ * 本软件为免费、开源软件。
+ * 本软件的版权(包括源码及二进制发布版本)归一切公众所有。
+ * 您可以自由使用、传播本软件。
+ * 您也可以以任何形式、任何目的使用本软件(包括源码及二进制发布版本)，而不受任何版权限制。
+ * =====================
+ * 作者: 孙明保
+ * 邮箱: sunmingbao@126.com
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <assert.h>
+#include "sudoku.h"
+
+void add_pos(t_pos_set *pt_pos_set, t_pos t_pos)
+{
+    assert(pt_pos_set->num<MAX_POS_NUM);
+
+    pt_pos_set->at_pos[pt_pos_set->num] = t_pos;
+    pt_pos_set->num++;
+}
+
+void static inline grid_del_candi(t_board *pt_board, int row, int col, char candi)
+{
+    int i;
+    t_grid *pt_grid = &(pt_board->at_grid[row][col]);
+    if (UNDER_DOING != pt_board->state)  return;
+    if (grid_has_value(pt_board, row, col)) return;
+    if (!grid_has_candi(pt_board, row, col, candi)) return;
+    pt_grid->ac_candi[candi-MIN_DIGIT_CHAR] = NO_VALUE_CHAR;
+    pt_grid->candi_num--;
+    if (0==pt_grid->candi_num)
+    {
+        pt_board->state = NO_SOLUTION;
+    }
+#if 0
+    if (1==pt_grid->candi_num)
+    {
+        for (i = 0; i<MAX_DIGIT_NUM; i++)
+        {
+            if (pt_grid->ac_candi[i] != NO_VALUE_CHAR)
+            {
+                assign_grid(pt_board, row, col, pt_grid->ac_candi[i]);
+                return;
+            }
+        }
+    }
+#endif
+}
+
+void static inline grid_set_value(t_board *pt_board, int row, int col, char value)
+{
+    t_grid *pt_grid = &(pt_board->at_grid[row][col]);
+    pt_grid->value = value;
+    pt_board->nr_grids_left--;
+    if (0==pt_board->nr_grids_left)
+        pt_board->state = SUCC_DONE;
+}
+
+void init_grid(t_grid *pt_grid)
+{
+    int i;
+    pt_grid->value = NO_VALUE_CHAR;
+    pt_grid->candi_num = MAX_DIGIT_NUM;
+    for (i = 0; i < MAX_DIGIT_NUM; i++)
+        pt_grid->ac_candi[i] = '1' + i;
+
+    pt_grid->ac_candi[MAX_DIGIT_NUM] = '\0';
+}
+
+void init_board(t_board *pt_board)
+{
+    int i, j;
+    pt_board->state = UNDER_DOING;
+    pt_board->nr_grids_left = MAX_GRID_NUM;
+    for (i = 0; i < MAX_ROW_NUM; i++)
+    {
+        for (j = 0; j < MAX_COL_NUM; j++)
+        {
+            init_grid(&(pt_board->at_grid[i][j]));
+
+        }
+    }
+}
+
+void get_row(t_pos_set *pt_pos_set, int row, int col)
+{
+    int i;
+    for (i = 0; i<MAX_COL_NUM; i++)
+    {
+        add_pos(pt_pos_set, make_pos(row, i));
+    }
+}
+
+void get_col(t_pos_set *pt_pos_set, int row, int col)
+{
+    int i;
+    for (i = 0; i<MAX_ROW_NUM; i++)
+    {
+        add_pos(pt_pos_set, make_pos(i, col));
+    }
+}
+
+void get_blk(t_pos_set *pt_pos_set, int row, int col)
+{
+    int i, j;
+    row -= (row % 3);
+    col -= (col % 3);
+    for (i = 0; i<3; i++)
+    {
+        for (j = 0; j<3; j++)
+        {
+            add_pos(pt_pos_set, make_pos(row+i, col+j));
+        }
+    }
+}
+
+void get_nbs(t_pos_set *pt_pos_set, int row, int col)
+{
+    pt_pos_set->num = 0;
+    get_row(pt_pos_set, row, col);
+    get_col(pt_pos_set, row, col);
+    get_blk(pt_pos_set, row, col);
+}
+
+void broad_cast_constrain(t_board *pt_board, int row, int col, char value)
+{
+    t_pos_set pos_set;
+    int i;
+    get_nbs(&pos_set, row, col);
+    for (i=0; i<pos_set.num; i++)
+    {
+        grid_del_candi(pt_board
+            , pos_set.at_pos[i].row
+            , pos_set.at_pos[i].col
+            , value);
+    }
+}
+
+int nbs_have_value(t_board *pt_board, int row, int col, char value)
+{
+    t_pos_set pos_set;
+    int i;
+    get_nbs(&pos_set, row, col);
+    for (i=0; i<pos_set.num; i++)
+    {
+        if (!grid_has_value(pt_board, pos_set.at_pos[i].row, pos_set.at_pos[i].col)) continue;
+        if (grid_value(pt_board, pos_set.at_pos[i].row, pos_set.at_pos[i].col)==value)
+        {
+            pt_board->tmp_pos.row=pos_set.at_pos[i].row;
+            pt_board->tmp_pos.col=pos_set.at_pos[i].col;
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+int nbs_have_only_this_candi(t_board *pt_board, int row, int col, char value)
+{
+    t_pos_set pos_set;
+    int i;
+    t_grid *pt_grid;
+    get_nbs(&pos_set, row, col);
+    for (i=0; i<pos_set.num; i++)
+    {
+        if (pos_set.at_pos[i].row==row && pos_set.at_pos[i].col==col) continue;
+        pt_grid = &(pt_board->at_grid[pos_set.at_pos[i].row][pos_set.at_pos[i].col]);
+        if (grid_has_value(pt_board, pos_set.at_pos[i].row, pos_set.at_pos[i].col)) continue;
+        if (pt_grid->candi_num!=1) continue;
+        if (grid_has_candi(pt_board, pos_set.at_pos[i].row, pos_set.at_pos[i].col, value))
+        {
+            pt_board->tmp_pos.row=pos_set.at_pos[i].row;
+            pt_board->tmp_pos.col=pos_set.at_pos[i].col;
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+void assign_grid(t_board *pt_board, int row, int col, char value)
+{
+    //printf("%d %d %c\n", row, col, value);
+    //t_grid *pt_grid = &(pt_board->at_grid[row][col]);
+    if (UNDER_DOING != pt_board->state)  return;
+    if (grid_has_value(pt_board, row, col)) return;
+    if (!grid_has_candi(pt_board, row, col, value))
+    {
+        pt_board->state = NO_SOLUTION;
+        return;
+    }
+    grid_set_value(pt_board, row, col, value);
+    broad_cast_constrain(pt_board, row, col, value);
+
+}
+
+void load_game(t_board *pt_board, const char *input)
+{
+    int i,j;
+    int row, col;
+    init_board(pt_board);
+    for (i=0;i<MAX_GRID_NUM; i++)
+    {
+        row = i/MAX_COL_NUM;
+        col = i%MAX_COL_NUM;
+
+        if (isdigit(input[i]))
+        assign_grid(pt_board, row, col, input[i]);
+    }
+}
+
+#if 0
+int main()
+{
+    printf("Hello world!\n");
+    solve(" 57 6   3"
+          "68  94  5"
+          " 13    2 "
+          " 76  3  2"
+          "  85 13  "
+          "1  6  57 "
+          " 2    86 "
+          "3  81  57"
+          "8   4 93 ");
+    return 0;
+}
+#endif
+
+
