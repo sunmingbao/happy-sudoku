@@ -33,14 +33,25 @@ MY_MENU MENU DISCARDABLE
 BEGIN
     	POPUP "游戏(&G)"
     	BEGIN
-    	        MENUITEM "新游戏(&N)\tCtrl+N", 		 IDM_CGMS
+    	        MENUITEM "闯关模式(&N)\tCtrl+N", 		     IDM_CGMS
+    	        MENUITEM "自选棋局", 		                 IDM_CGMS
+    	        MENUITEM "随机玩一局", 		                 IDM_CGMS
+    	        MENUITEM "空棋盘",                           IDM_CGMS
+
+    	        MENUITEM SEPARATOR
+    	        
+    	        MENUITEM "当前进度存档(&A)...\tCtrl+S",  IDM_FILE_SAVE_AS
     	        MENUITEM "打开存档(&O)...\tCtrl+O", 	 IDM_FILE_OPEN
-    	        MENUITEM "当前进度存档(&A)...", 		 IDM_FILE_SAVE_AS
-        		MENUITEM SEPARATOR
-        		POPUP "最近打开的存档"
-			BEGIN
-				MENUITEM "&1 abc", 	ID_FILE_RECENT_FILE_BEGIN
-			END
+    	        POPUP "最近的存档"
+			    BEGIN
+				    MENUITEM "&1 abc", 	ID_FILE_RECENT_FILE_BEGIN
+			    END
+
+    	        MENUITEM SEPARATOR
+    	        
+    	        MENUITEM "存为自定义游戏(&A)...\tCtrl+S",  IDM_FILE_SAVE_AS
+    	        MENUITEM "加载自定义游戏",                   IDM_CGMS
+
         		MENUITEM SEPARATOR
         		MENUITEM "退出(&X)", 				 IDM_APP_EXIT
     	END
@@ -57,6 +68,10 @@ BEGIN
     	        MENUITEM "显示提示(&H)\tCtrl+H", 			IDT_TOOLBAR_HINT
     	        MENUITEM "显示标记(&M)\tCtrl+M", 			IDT_TOOLBAR_MARK
     	        MENUITEM "显示计时(&M)\tCtrl+T", 			IDT_TOOLBAR_TIMER, CHECKED
+    	        
+    	        MENUITEM SEPARATOR
+    	        MENUITEM "音效(&T)", 				    IDM_APP_TOOLBAR_WIN, CHECKED
+        		MENUITEM "背景音乐(&S)", 				IDM_APP_STATUSBAR_WIN, CHECKED
 
     	        MENUITEM SEPARATOR
     	        MENUITEM "工具栏(&T)", 				IDM_APP_TOOLBAR_WIN, CHECKED

@@ -56,6 +56,7 @@ void open_file()
     update_file_open_history(doc_file_path);
 }
 
+
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     HDC hdc ;
@@ -182,7 +183,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 hMenu = GetMenu(hwnd);
                 hMenu = GetSubMenu(hMenu, 0);
-                hMenu = GetSubMenu(hMenu, 4);
+                hMenu = GetSubMenu(hMenu, 7);
                 populate_recent_files(hMenu);
             }
 

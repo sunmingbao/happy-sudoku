@@ -354,6 +354,8 @@ void unfocus_any_grid()
     int old_row = cur_row;
     int old_col = cur_col;
 
+    ShowWindow(hwnd_input_board, 0);
+
     cur_row=-1;
     cur_col=-1;
 
@@ -761,6 +763,20 @@ int stage_mode_begin()
 
 }
 
+void toolbar_redo_undo_init()
+{
+    if (!can_un_do())
+        set_toolbar_button(IDT_TOOLBAR_UNDO, 0);
+    else
+        set_toolbar_button(IDT_TOOLBAR_UNDO, 1);
+
+    if (!can_re_do())
+        set_toolbar_button(IDT_TOOLBAR_REDO, 0);
+    else
+        set_toolbar_button(IDT_TOOLBAR_REDO, 1);
+
+}
+
 void SaveAsArch(char *file_path)
 {
     int i, j;
@@ -768,9 +784,18 @@ void SaveAsArch(char *file_path)
     char buf[128]={0};
 
     FILE *fp = fopen(file_path, "w");
-    sprintf(buf, "%d %d \r\n", game_mode, cur_stage_idx);
+    sprintf(buf, "v%c.%c.%c.%c \r\n"
+        , version[0], version[1],version[2],version[3]);
     fputs(buf, fp);
-    sprintf(buf, "%d %d \r\n", game_use_time, game_left_time);
+
+    sprintf(buf, "mode=%d \r\n", game_mode);
+    fputs(buf, fp);
+    sprintf(buf, "stage_idx=%d \r\n", cur_stage_idx);
+    fputs(buf, fp);
+
+    sprintf(buf, "time_used=%d \r\n", game_use_time);
+    fputs(buf, fp);
+    sprintf(buf, "time_left=%d \r\n", game_left_time);
     fputs(buf, fp);
 
     for (i=0; i<MAX_GRID_NUM; i++)
@@ -788,7 +813,7 @@ void SaveAsArch(char *file_path)
 
     int ret = fputs(buf, fp);
     fputs("\r\n", fp);
-    sprintf(buf, "%d\r\n", gt_rb_q.num);
+    sprintf(buf, "finish_grid_num=%d \r\n", gt_rb_q.num);
     fputs(buf, fp);
     for (i=0;i<gt_rb_q.num;i++)
     {
@@ -803,6 +828,7 @@ void SaveAsArch(char *file_path)
     }
 
     fclose(fp);
+    update_file_open_history(file_path);
 }
 
 void LoadArch(char *file_path)
@@ -820,15 +846,28 @@ void LoadArch(char *file_path)
     KillTimer(hwnd_main_board, TIMER_ID_GAME_USE_TIME_CNT) ;
 
     fgets(buf, sizeof(buf), fp);
-    sscanf(buf, "%d %d \r\n", &game_mode, &cur_stage_idx);
+    if (buf[0]!='v' || buf[1]!=version[0])
+    {
+        WinPrintf(hwnd_frame, TEXT("´íÎó"), TEXT("´æµµÎÄ¼þ°æ±¾²»Æ¥Åä"));
+        fclose(fp);
+        return;
+
+    }
+
     fgets(buf, sizeof(buf), fp);
-    sscanf(buf, "%d %d \r\n", &game_use_time, &game_left_time);
+    sscanf(buf, "mode=%d \r\n", &game_mode);
+    fgets(buf, sizeof(buf), fp);
+    sscanf(buf, "stage_idx=%d \r\n", &cur_stage_idx);
+    fgets(buf, sizeof(buf), fp);
+    sscanf(buf, "time_used=%d \r\n", &game_use_time);
+    fgets(buf, sizeof(buf), fp);
+    sscanf(buf, "time_left=%d \r\n", &game_left_time);
 
     fgets(buf, sizeof(buf), fp);
     InitNewGame(buf);
 
     fgets(buf, sizeof(buf), fp);
-    sscanf(buf, "%d \r\n", &nr_input);
+    sscanf(buf, "finish_grid_num=%d \r\n", &nr_input);
 
     for (i=0;i<nr_input;i++)
     {
@@ -841,6 +880,7 @@ void LoadArch(char *file_path)
     fclose(fp);
 
     refresh_board();
+    toolbar_redo_undo_init();
     update_statusbar();
     update_statusbar_time();
 
