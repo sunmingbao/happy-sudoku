@@ -57,6 +57,7 @@ default: $(target)
 
 $(target): $(ALL_OBJS)
 	$(CC) -o $@ $(ALL_OBJS)  $(LDFLAG)
+	copy $(PRJ_DIR)\other_files\stages.txt $(OBJ_DIR)\
 
 
 $(OBJ_DIR)\res.orc: $(PRJ_DIR)\res\resource.rc

@@ -85,8 +85,7 @@ void *get_grid_info(HWND hwnd)
     return NULL;
 }
 
-char *gac_stages[] =
-{
+char empty_stage[] =
 "........."
 "........."
 "........."
@@ -95,52 +94,72 @@ char *gac_stages[] =
 "........."
 "........."
 "........."
-".........",
+".........";
 
-".57.6...3"
-"68..94..5"
-".13....2."
-".76..3..2"
-"..85.13.."
-"1..6..57."
-".2....86."
-"3..81..57"
-"8...4.93.",
-
-".329.5.6."
-"...237..."
-"97.8..4.."
-"45...8.7."
-"..8.5.3.."
-".2.1...84"
-"..7..2.58"
-"...713..."
-".1.5.493.",
-
-"8.176...."
-"...9...21"
-".948...6."
-".471...3."
-"1.......2"
-".6...217."
-".1...728."
-"43...6..."
-"....834.6"
-};
+char cur_stage[82];
 
 enum
 {
     StageMode = 1000,
     FreeMode,
     UsrLoadMode,
-    UsrDefMode,
+    EmptyMode,
 };
 
-int nr_stages = sizeof(gac_stages)/sizeof(gac_stages[0])-1;
+int nr_stages;
 int cur_stage_idx=1;
 int game_mode = StageMode;
 int game_over = 0;
 
+void InitStageNum()
+{
+    char buf[128]={0};
+
+    FILE *fp=fopen("stages.txt","r");
+    if (NULL==fp) return;
+
+    fgets(buf, sizeof(buf), fp);
+    sscanf(buf, "stage_num=%d \r\n", &nr_stages);
+    fclose(fp);
+
+}
+
+void load_stage(char *output, int idx)
+{
+    char buf[128]={0};
+    char tmp[16];
+    int cnt = 0;
+    char *pchar;
+
+    FILE *fp=fopen("stages.txt","r");
+    if (NULL==fp) return;
+
+    sprintf(tmp, "[%03d]", idx);
+
+    while (memcmp(tmp, buf, 5))
+    {
+        fgets(buf, sizeof(buf), fp);
+    }
+
+    while (cnt<81)
+    {
+        fgets(buf, sizeof(buf), fp);
+        pchar = buf;
+        while ((*pchar)!=0)
+        {
+            if ((*pchar) == '.' || ((*pchar) >= '1' && (*pchar) <= '9'))
+            {
+                output[cnt] = *pchar;
+                cnt++;
+            }
+            pchar++;
+        }
+    }
+
+    output[cnt] = 0;
+    fclose(fp);
+
+}
 
 void time_str(char *info, int sec_value)
 {
@@ -215,7 +234,7 @@ load_game(pt_board, input);
         else
             at_grid[row][col].input_by_user = 0;
 
-        strcpy(at_grid[row][col].mark, "......... ");
+        strcpy(at_grid[row][col].mark, "123456789 ");
     }
 
 }
@@ -249,7 +268,7 @@ void update_statusbar()
         sprintf(info, "自由模式");
     else if (UsrLoadMode==game_mode)
         sprintf(info, "自定义游戏");
-    else if (UsrDefMode==game_mode)
+    else if (EmptyMode==game_mode)
         sprintf(info, "空棋盘模式");
 
     SendMessage(hwnd_statusbar, SB_SETTEXT,0, (LPARAM)info); 
@@ -444,7 +463,8 @@ void re_do()
 void step_to_next_stage()
 {
     cur_stage_idx++;
-    InitNewGame(gac_stages[cur_stage_idx]);
+    load_stage(cur_stage, cur_stage_idx);
+    InitNewGame(cur_stage);
     refresh_board();
 
     update_statusbar();
@@ -633,7 +653,7 @@ LRESULT CALLBACK grid_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
             }
             else if (1==display_help && 
                 pt_grid_info->input_by_user &&
-                strcmp(pt_grid_info->mark, "......... ") )
+                strcmp(pt_grid_info->mark, "123456789 ") )
             {
                 SetRect(&rect, 0, 0, grid_size, grid_size/2);
                 fw_text_out_middle_trans(hdc
@@ -905,6 +925,7 @@ LRESULT CALLBACK main_board_WndProc (HWND hwnd, UINT message, WPARAM wParam, LPA
         case WM_CREATE:
         {
             int i,j;
+            InitStageNum();
 
             hwnd_main_board = hwnd;
 

@@ -16,9 +16,13 @@
 #include "ext_utils_textout.h"
 
 
-#define    COLOUR_SELECTED            RGB(0x00,0x00,0xff)
+#define    COLOUR_DELETED            RGB(0x00,0x00,0xff)
+#define    COLOUR_NOT_DELETED        RGB(0xff,0xff,0xff)
+
+#define    COLOUR_SELECTED            RGB(0xff,0x00,0x00)
 #define    COLOUR_NOT_SELECTED        RGB(0xff,0xff,0xff)
 
+HBRUSH hBrush_NOT_DELETED, hBrush_DELETED;
 HBRUSH hBrush_NOT_SELECTED, hBrush_SELECTED;
 static int grid_width, grid_height, font_size;
 
@@ -155,16 +159,18 @@ void mark_win_paint(HDC hdc, RECT *rect, t_input_grid_info *pt_grid_info)
        char value = idx + 1 + '0';
        HBRUSH hBrush;
        if (mark_str[idx] >= '1' && mark_str[idx] <= '9')
-            hBrush = hBrush_SELECTED;
+            hBrush = hBrush_NOT_DELETED;
+       else if (is_last_input_grid(row, col))
+            hBrush = hBrush_NOT_DELETED;
        else
-            hBrush = hBrush_NOT_SELECTED;
+            hBrush = hBrush_DELETED;
 
 
-            FillRect(hdc, rect, hBrush) ;
+        FillRect(hdc, rect, hBrush) ;
 
-            fw_text_out_middle_trans(hdc
-                    , rect, font_size, RGB(0x0,0x0,0x0)
-                    , pt_grid_info->val, 1);
+        fw_text_out_middle_trans(hdc
+                , rect, font_size, RGB(0x0,0x0,0x0)
+                , pt_grid_info->val, 1);
 
 
 }
@@ -255,10 +261,13 @@ LRESULT CALLBACK input_grid_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
                 else
                 {
                     int idx = input_grid_idx(row, col);
-                    mark_str[idx] = pt_grid_info->val[0];
-                    refresh_input_grid(row, col);
+                    if (mark_str[idx]=='.')
+                        mark_str[idx] = pt_grid_info->val[0];
+                    else
+                        mark_str[idx] = '.';
 
                 }
+                refresh_input_grid(row, col);
                 return 0;
             }
             
@@ -411,6 +420,8 @@ LRESULT CALLBACK input_board_WndProc (HWND hwnd, UINT message, WPARAM wParam, LP
 
             InitInputGrids();
 
+            hBrush_NOT_DELETED= CreateSolidBrush (COLOUR_NOT_DELETED) ;
+            hBrush_DELETED= CreateSolidBrush (COLOUR_DELETED) ;
             hBrush_NOT_SELECTED= CreateSolidBrush (COLOUR_NOT_SELECTED) ;
             hBrush_SELECTED= CreateSolidBrush (COLOUR_SELECTED) ;
 

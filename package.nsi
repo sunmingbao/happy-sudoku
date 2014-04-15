@@ -77,6 +77,7 @@ Section "Ö÷³ÌÐò" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite try
   File "obj\${MAIN_PROG_NAME}"
+  File "stages.txt"
   File "release_notes.txt"
   
 ; Shortcuts
@@ -117,6 +118,7 @@ Section Uninstall
   !insertmacro MUI_STARTMENU_GETFOLDER "Application" $ICONS_GROUP
   Delete "$INSTDIR\uninst.exe"
   Delete "$INSTDIR\${MAIN_PROG_NAME}"
+  Delete "$INSTDIR\stages.txt"
   Delete "$INSTDIR\release_notes.txt"
 
   Delete "$SMPROGRAMS\$ICONS_GROUP\Ð¶ÔØ ${PRODUCT_NAME}.lnk"
