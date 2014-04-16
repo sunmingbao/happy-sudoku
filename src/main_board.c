@@ -39,7 +39,6 @@ static int win_size, grid_size, big_font_size, small_font_size;
 HBRUSH hBrush_NO_VALUE, hBrush_HAS_VALUE, hBrush_INPUT_BY_USER, hBrush_ON_FOCUS;
 HBRUSH hBrush_BLINK_1, hBrush_BLINK_2;
 
-#define    TIMER_ID_GAME_USE_TIME_CNT    (1)
 #define    DAY_SEC    (60*60*24)
 #define    HOUR_SEC   (60*60)
 #define    MIN_SEC   (60)
@@ -66,6 +65,7 @@ typedef struct
     int  col;
     int  input_by_user;
     char mark[MAX_DIGIT_NUM+2];
+    HBRUSH hBrush;
 }t_grid_info;
 
 t_grid_info at_grid[9][9];
@@ -127,16 +127,13 @@ void InitStageNum()
 void load_stage(char *output, int idx)
 {
     char buf[128]={0};
-    char tmp[16];
     int cnt = 0;
     char *pchar;
 
     FILE *fp=fopen("stages.txt","r");
     if (NULL==fp) return;
 
-    sprintf(tmp, "[%03d]", idx);
-
-    while (memcmp(tmp, buf, 5))
+    while (buf[0]!='[' || atoi(buf+1)!=idx)
     {
         fgets(buf, sizeof(buf), fp);
     }
@@ -250,8 +247,7 @@ void InitGrids()
 
         at_grid[row][col].row = row;
         at_grid[row][col].col = col;
-
-
+        at_grid[row][col].hBrush = NULL;
     }
 
 }
@@ -410,6 +406,24 @@ void focus_grid(int row, int col)
     refresh_grid(cur_row,cur_col);
 }
 
+void blink_grid(int row, int col)
+{
+    at_grid[row][col].hBrush = hBrush_BLINK_1;
+    refresh_grid(row, col);
+    Sleep(250);
+    at_grid[row][col].hBrush = hBrush_BLINK_2;
+    refresh_grid(row, col);
+    Sleep(250);
+    at_grid[row][col].hBrush = hBrush_BLINK_1;
+    refresh_grid(row, col);
+    Sleep(250);
+    at_grid[row][col].hBrush = hBrush_BLINK_2;
+    refresh_grid(row, col);
+    Sleep(250);
+    at_grid[row][col].hBrush = NULL;
+    //refresh_grid(row, col);
+}
+
 int can_un_do()
 {
     return (gt_rb_q.num>0);
@@ -469,12 +483,12 @@ void step_to_next_stage()
 
     update_statusbar();
 
-    KillTimer(hwnd_main_board, TIMER_ID_GAME_USE_TIME_CNT) ;
+    KillTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT) ;
     game_use_time = 0;
     game_left_time = 7*DAY_SEC;
     update_statusbar_time();
 
-    SetTimer(hwnd_main_board, TIMER_ID_GAME_USE_TIME_CNT, 1000, NULL);
+    SetTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT, 1000, NULL);
 
 }
 
@@ -499,10 +513,10 @@ void proc_digit_input(char value)
 
         if (!grid_has_candi(pt_board, cur_row, cur_col, char_int+'0'))
         {
-            WinPrintf(hwnd_frame,TEXT("错误"), TEXT("输入数字与已有数字冲突"));
+            //WinPrintf(hwnd_frame,TEXT("错误"), TEXT("输入数字与已有数字冲突"));
             nbs_have_value(pt_board, cur_row, cur_col, char_int+'0');
-            //play_sound(wrong_sound);
-            //blink_grid(pt_board->tmp_pos.row, pt_board->tmp_pos.col);
+            play_sound_async(TEXT("sd_wrong"),  SND_RESOURCE);
+            blink_grid(pt_board->tmp_pos.row, pt_board->tmp_pos.col);
             return;
         }
 
@@ -510,12 +524,13 @@ void proc_digit_input(char value)
         {
             WinPrintf(hwnd_frame,TEXT("错误"), TEXT("输入数字与已有数字冲突"));
             //at_grid[row][ col]->BlinkPaint(wxT("0"));
-            //play_sound(no_solution_sound);
+            //play_sound_async(TEXT("sd_wrong"),  SND_RESOURCE);
             //blink_grid(pt_board->tmp_pos.row, pt_board->tmp_pos.col);
             return;
         }
 
         do_user_input(cur_row, cur_col, char_int+'0');
+        play_sound_async(TEXT("sd_right"),  SND_RESOURCE);
         refresh_grid(cur_row,cur_col);
         set_toolbar_button(IDT_TOOLBAR_UNDO, 1);
         update_statusbar();
@@ -530,7 +545,7 @@ void proc_digit_input(char value)
 #if 1
         if (board_solved(pt_board))
         {
-            KillTimer(hwnd_main_board, TIMER_ID_GAME_USE_TIME_CNT) ;
+            KillTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT) ;
 
             if (FreeMode==game_mode)
             {
@@ -612,7 +627,9 @@ LRESULT CALLBACK grid_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
 
             SetRect(&rect, 0, 0, grid_size, grid_size);
 
-            if (grid_on_focus(row, col))
+            if (pt_grid_info->hBrush != NULL)
+                hBrush = pt_grid_info->hBrush;
+            else if (grid_on_focus(row, col))
                 hBrush = hBrush_ON_FOCUS;
             else if (grid_has_value(pt_board, row, col))
             {
@@ -863,7 +880,7 @@ void LoadArch(char *file_path)
     FILE *fp=fopen(file_path,"r");
     if (NULL==fp) return;
 
-    KillTimer(hwnd_main_board, TIMER_ID_GAME_USE_TIME_CNT) ;
+    KillTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT) ;
 
     fgets(buf, sizeof(buf), fp);
     if (buf[0]!='v' || buf[1]!=version[0])
@@ -904,7 +921,7 @@ void LoadArch(char *file_path)
     update_statusbar();
     update_statusbar_time();
 
-    SetTimer(hwnd_main_board, TIMER_ID_GAME_USE_TIME_CNT, 1000, NULL);
+    SetTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT, 1000, NULL);
     
     update_file_open_history(file_path);
 
@@ -959,6 +976,9 @@ LRESULT CALLBACK main_board_WndProc (HWND hwnd, UINT message, WPARAM wParam, LPA
                 
             stage_mode_begin();
 
+            mciSendString("open music.mp3 type mpegvideo alias music", NULL, 0, NULL);
+            //mciSendString("open music.MID type sequencer alias music", NULL, 0, NULL);
+            mciSendString("play music repeat", NULL, 0, NULL);
             return 0 ;
         }
 
@@ -1004,7 +1024,7 @@ LRESULT CALLBACK main_board_WndProc (HWND hwnd, UINT message, WPARAM wParam, LPA
             ShowWindow(hwnd_input_board, 0);
             if (no_grid_on_focus())
             {
-                WinPrintf(hwnd, TEXT("提醒"), TEXT("请先选中一个方格"));
+                show_tip(TEXT("请先选中一个方格"));
                 return 0;
             }
             if (wParam<'1' || wParam>'9')

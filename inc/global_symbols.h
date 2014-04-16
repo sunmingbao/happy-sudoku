@@ -20,6 +20,22 @@
 extern HINSTANCE g_hInstance;
 extern int init_over;
 
+extern int cxChar; /* SYSTEM_FIXED_FONT width */
+extern int cyChar; /* SYSTEM_FIXED_FONT height */
+extern int scrn_width;  /* ÆÁÄ»¿í¶È */
+extern int scrn_height; /* ÆÁÄ»¸ß¶È */
+
+#define    TIMER_GAME_USE_TIME_CNT    (1)
+
+#define TIMER_TIP_WIN_SHOW    2
+#define TIMER_TIP_WIN_SHOW_GAP 3
+
+#define TIMER_TIP_WIN_HIDE    3
+#define TIMER_TIP_WIN_HIDE_GAP 30
+
+#define TIMER_TIP_WIN_LAST    4
+#define TIMER_TIP_WIN_LAST_GAP 500
+
 int register_frame();
 void set_frame_title(TCHAR *file_name);
 
@@ -71,5 +87,10 @@ void display_mark_win(int row, int col);
 void mov_input_win_to_grid(int row, int col);
 extern TCHAR szInputBoardWinClassName[] ;
 extern HWND    hwnd_input_board;
+
+extern TCHAR szTipWinClassName[];
+extern HWND    hwnd_tip;
+int register_tip_win();
+void show_tip(TCHAR *info);
 #endif
 

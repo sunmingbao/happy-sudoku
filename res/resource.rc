@@ -27,6 +27,8 @@ tb_icon_redo_dis     ICON "redo_dis.ico"
 tb_icon_hint         ICON "hint.ico"
 tb_icon_mark         ICON "pen.ico"
 tb_icon_timer        ICON "timer.ico"
+sd_right             WAVE "right.wav"
+sd_wrong             WAVE "wrong.wav"
 
 // Menu
 MY_MENU MENU DISCARDABLE 

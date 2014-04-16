@@ -44,5 +44,28 @@ void add_tip(HWND htip_control, HWND hwnd, TCHAR *tips)
 }
 
 
+TCHAR para_pszSound[64];
+HMODULE para_hmod;
+DWORD   para_fdwSound;
 
+
+DWORD WINAPI  play_sound_thread(LPVOID lpParameter)
+{
+    PlaySound(
+    para_pszSound, 
+    para_hmod,  
+    para_fdwSound);
+
+    return 0;
+}
+
+
+void play_sound_async(LPCTSTR pszSound,  DWORD fdwSound)
+{
+    if (NULL==para_hmod) para_hmod=GetModuleHandle(NULL);
+    strcpy(para_pszSound, pszSound);
+    para_fdwSound = fdwSound;
+
+    launch_thread(play_sound_thread, NULL);
+}
 

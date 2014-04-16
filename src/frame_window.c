@@ -97,9 +97,18 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     set_frame_title(TEXT("点击选中方格, 单击或用键盘输入数字, 右键标记, ↑↓←→格间移动"));
 
-            ret=get_last_doc_file(file_to_open);
+            //ret=get_last_doc_file(file_to_open);
 
-            if (0==ret) open_file();
+            //if (0==ret) open_file();
+            hwnd_tip = CreateWindow (szTipWinClassName, TEXT ("tip win"),
+                WS_POPUP,
+                CW_USEDEFAULT,
+                CW_USEDEFAULT,
+                CW_USEDEFAULT,
+                CW_USEDEFAULT,
+                hwnd, NULL, g_hInstance, NULL) ;
+
+            ShowWindow (hwnd_tip, 0) ;
 
             return 0 ;
 

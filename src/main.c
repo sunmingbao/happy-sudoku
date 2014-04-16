@@ -32,6 +32,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     register_grid_win();
     register_input_board_win();
     register_input_grid_win();
+    register_tip_win();
 
     create_windows(iCmdShow);
 

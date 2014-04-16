@@ -28,5 +28,21 @@ static inline void refresh_window(HWND hwnd)
     UpdateWindow(hwnd);
 }
 
+static inline HANDLE launch_thread(LPTHREAD_START_ROUTINE ThreadFunc, LPVOID lpParameter)
+{
+    HANDLE hThrd;
+    DWORD threadId;
+    
+    hThrd = CreateThread(NULL,
+        0,
+        ThreadFunc,
+        lpParameter,
+        0,
+        &threadId );
+    return hThrd;
+
+}
+void play_sound_async(LPCTSTR pszSound,  DWORD fdwSound);
+    
 #endif
 

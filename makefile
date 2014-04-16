@@ -17,7 +17,7 @@ CFLAG := -Wall -O2  -DBUILD_TIME='"$(BUILD_TIME)"' -D_WIN32_IE=0x0501 -D_WIN32_W
 # 如果要编译_UNICODE版本，则放开下面的注释
 #CFLAG := $(CFLAG) -D_UNICODE
 
-LDFLAG := -mwindows  -s  -lkernel32 -luser32 -lgdi32 -lcomctl32 -lws2_32 
+LDFLAG := -mwindows  -s  -lkernel32 -luser32 -lgdi32 -lcomctl32 -lws2_32 -lWinmm 
 
 
 PRJ_DIR := .
@@ -28,6 +28,9 @@ OBJ_DIR:=$(PRJ_DIR)\obj
 
 PREPAIR_OBJ_DIR:=$(shell mkdir $(OBJ_DIR))
 PREPAIR_OBJ_DIR:=$(shell del /F /Q $(OBJ_DIR)\\*)
+PREPAIR_OBJ_DIR:=$(shell copy $(PRJ_DIR)\other_files\stages.txt $(OBJ_DIR)\)
+PREPAIR_OBJ_DIR:=$(shell copy $(PRJ_DIR)\other_files\music.MID $(OBJ_DIR)\)
+PREPAIR_OBJ_DIR:=$(shell copy $(PRJ_DIR)\other_files\music.mp3 $(OBJ_DIR)\)
 
 SRC_FILES_BASE_NAMES:=$(shell tools\get_src_files.bat)
 OBJ_FILES:=$(addprefix $(OBJ_DIR)\, $(addsuffix .o, $(SRC_FILES_BASE_NAMES)))
@@ -57,7 +60,6 @@ default: $(target)
 
 $(target): $(ALL_OBJS)
 	$(CC) -o $@ $(ALL_OBJS)  $(LDFLAG)
-	copy $(PRJ_DIR)\other_files\stages.txt $(OBJ_DIR)\
 
 
 $(OBJ_DIR)\res.orc: $(PRJ_DIR)\res\resource.rc
