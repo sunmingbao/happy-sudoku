@@ -76,6 +76,8 @@ BEGIN
     	BEGIN
     	        MENUITEM "显示提示(&H)\tCtrl+H", 			IDT_TOOLBAR_HINT
     	        MENUITEM "显示标记(&M)\tCtrl+M", 			IDT_TOOLBAR_MARK, CHECKED
+    	        
+    	        MENUITEM SEPARATOR
     	        MENUITEM "显示计时(&T)\tCtrl+T", 			IDT_TOOLBAR_TIMER, CHECKED
     	        
     	        MENUITEM SEPARATOR
