@@ -30,7 +30,7 @@
 /* 以下内容通常无须修改 */
 extern const TCHAR     szAppName[];
 extern const char      version[];
-#define    DOC_FILE_FILTER    APP_NAME" file (*."DOC_FILE_SUFFIX")\0*."DOC_FILE_SUFFIX"\0\0"
+#define    DOC_FILE_FILTER    "数独游戏存档(*."DOC_FILE_SUFFIX")\0*."DOC_FILE_SUFFIX"\0\0"
 
 #endif
 

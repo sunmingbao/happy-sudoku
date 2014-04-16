@@ -29,6 +29,9 @@ tb_icon_mark         ICON "pen.ico"
 tb_icon_timer        ICON "timer.ico"
 sd_right             WAVE "right.wav"
 sd_wrong             WAVE "wrong.wav"
+sd_no_solution       WAVE "no_solution.wav"
+sd_stage_succ        WAVE "stage_succ.wav"
+sd_all_stages_succ   WAVE "all_stages_succ.wav"
 
 // Menu
 MY_MENU MENU DISCARDABLE 
@@ -36,14 +39,18 @@ BEGIN
     	POPUP "游戏(&G)"
     	BEGIN
     	        MENUITEM "闯关模式(&N)\tCtrl+N", 		     IDM_CGMS
-    	        MENUITEM "自选棋局", 		                 IDM_CGMS
-    	        MENUITEM "随机玩一局", 		                 IDM_CGMS
-    	        MENUITEM "空棋盘",                           IDM_CGMS
+    	        POPUP "选关模式"
+			    BEGIN
+				    MENUITEM "&1 abc",                       ID_STAGE_1
+			    END
+
+    	        MENUITEM "随机生成游戏", 		             IDM_RAND_GAME, GRAYED
+    	        MENUITEM "空棋盘",                           IDM_EMPTY_GAME
 
     	        MENUITEM SEPARATOR
     	        
-    	        MENUITEM "当前进度存档(&A)...\tCtrl+S",  IDM_FILE_SAVE_AS
-    	        MENUITEM "打开存档(&O)...\tCtrl+O", 	 IDM_FILE_OPEN
+    	        MENUITEM "当前进度存档(&A)...\tCtrl+S",  IDM_ARCH_SAVE
+    	        MENUITEM "打开存档(&O)...\tCtrl+O", 	 IDM_ARCH_OPEN
     	        POPUP "最近的存档"
 			    BEGIN
 				    MENUITEM "&1 abc", 	ID_FILE_RECENT_FILE_BEGIN
@@ -51,8 +58,8 @@ BEGIN
 
     	        MENUITEM SEPARATOR
     	        
-    	        MENUITEM "存为自定义游戏(&A)...\tCtrl+S",  IDM_FILE_SAVE_AS
-    	        MENUITEM "加载自定义游戏",                   IDM_CGMS
+    	        MENUITEM "存为 数独迷题",  IDM_SAVE_AS_PUZZLE
+    	        MENUITEM "加载 数独迷题",  IDM_OPEN_PUZZLE
 
         		MENUITEM SEPARATOR
         		MENUITEM "退出(&X)", 				 IDM_APP_EXIT
@@ -72,8 +79,8 @@ BEGIN
     	        MENUITEM "显示计时(&M)\tCtrl+T", 			IDT_TOOLBAR_TIMER, CHECKED
     	        
     	        MENUITEM SEPARATOR
-    	        MENUITEM "音效(&T)", 				    IDM_APP_TOOLBAR_WIN, CHECKED
-        		MENUITEM "背景音乐(&S)", 				IDM_APP_STATUSBAR_WIN, CHECKED
+    	        MENUITEM "音效(&T)", 				    IDM_SOUND, CHECKED
+        		MENUITEM "背景音乐(&S)", 				IDM_MUSIC, CHECKED
 
     	        MENUITEM SEPARATOR
     	        MENUITEM "工具栏(&T)", 				IDM_APP_TOOLBAR_WIN, CHECKED
@@ -81,6 +88,11 @@ BEGIN
 
     	END
 
+    	POPUP "终极法宝(&B)"
+    	BEGIN
+    	        MENUITEM "数独求解器", 			IDM_SUDOKU_SOLVER, GRAYED
+    	END
+    	
     	POPUP "帮助(&H)"
     	BEGIN
         	    MENUITEM "获取新版本...",	    IDM_GET_NEW_VERSION
@@ -96,8 +108,8 @@ END
 MY_ACCELER ACCELERATORS DISCARDABLE 
 BEGIN
     	"^N",         IDM_CGMS,          ASCII,  NOINVERT
-    	"^O",         IDM_FILE_OPEN,         ASCII,  NOINVERT
-    	"^S",         IDM_FILE_SAVE_AS,         ASCII,  NOINVERT
+    	"^O",         IDM_ARCH_OPEN,         ASCII,  NOINVERT
+    	"^S",         IDM_ARCH_SAVE,         ASCII,  NOINVERT
     	"^Z",         IDT_TOOLBAR_UNDO,         ASCII,  NOINVERT
     	"^Y",         IDT_TOOLBAR_REDO,         ASCII,  NOINVERT
     	"^H",         IDT_TOOLBAR_HINT,         ASCII,  NOINVERT

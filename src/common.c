@@ -48,6 +48,7 @@ TCHAR para_pszSound[64];
 HMODULE para_hmod;
 DWORD   para_fdwSound;
 
+int sound_enabled = 1;
 
 DWORD WINAPI  play_sound_thread(LPVOID lpParameter)
 {
@@ -62,10 +63,27 @@ DWORD WINAPI  play_sound_thread(LPVOID lpParameter)
 
 void play_sound_async(LPCTSTR pszSound,  DWORD fdwSound)
 {
+    if (!is_sound_enabled()) return;
     if (NULL==para_hmod) para_hmod=GetModuleHandle(NULL);
     strcpy(para_pszSound, pszSound);
     para_fdwSound = fdwSound;
 
     launch_thread(play_sound_thread, NULL);
 }
+
+void enable_sound()
+{
+    sound_enabled = 1;
+}
+
+void disable_sound()
+{
+    sound_enabled = 0;
+}
+
+int is_sound_enabled()
+{
+    return sound_enabled;
+}
+
 

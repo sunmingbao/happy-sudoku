@@ -66,10 +66,15 @@ extern HWND    hwnd_main_board;
 
 int register_main_board_win();
 int stage_mode_begin();
+void select_stage(int stage_idx);
+void select_empty_game();
 void SaveAsArch(char *file_path);
+void SaveAsPuzzle(char *file_path);
+void load_puzzle_as_game(char *file_path);
 void LoadArch(char *file_path);
 extern int display_help;
 extern int display_time;
+extern int play_music;
 int register_grid_win();
 void unfocus_any_grid();
 void * grid_mark_str(int row, int col);

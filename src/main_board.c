@@ -24,6 +24,7 @@ TCHAR szMainBoardWinClassName[] = TEXT ("main_board") ;
 HWND    hwnd_main_board;
 int display_help = 1;
 int display_time = 1;
+int play_music = 1;
 
 #define    GAP_SIZE    (5)
 static int win_size, grid_size, big_font_size, small_font_size;
@@ -261,9 +262,9 @@ void update_statusbar()
         ,cur_stage_idx
         ,nr_stages);
     else if (FreeMode==game_mode)
-        sprintf(info, "自由模式");
+        sprintf(info, "选关模式: 第 %d 关", cur_stage_idx);
     else if (UsrLoadMode==game_mode)
-        sprintf(info, "自定义游戏");
+        sprintf(info, "自加载迷题");
     else if (EmptyMode==game_mode)
         sprintf(info, "空棋盘模式");
 
@@ -522,10 +523,10 @@ void proc_digit_input(char value)
 
         if (nbs_have_only_this_candi(pt_board, cur_row, cur_col, char_int+'0'))
         {
-            WinPrintf(hwnd_frame,TEXT("错误"), TEXT("输入数字与已有数字冲突"));
+            //WinPrintf(hwnd_frame,TEXT("错误"), TEXT("输入数字与已有数字冲突"));
             //at_grid[row][ col]->BlinkPaint(wxT("0"));
-            //play_sound_async(TEXT("sd_wrong"),  SND_RESOURCE);
-            //blink_grid(pt_board->tmp_pos.row, pt_board->tmp_pos.col);
+            play_sound_async(TEXT("sd_wrong"),  SND_RESOURCE);
+            blink_grid(pt_board->tmp_pos.row, pt_board->tmp_pos.col);
             return;
         }
 
@@ -550,29 +551,38 @@ void proc_digit_input(char value)
             if (FreeMode==game_mode)
             {
                 game_over=1;
-                WinPrintf(hwnd_frame,TEXT("恭喜"), TEXT("恭喜恭喜！自由模式胜利！"));
+                play_sound_async(TEXT("sd_stage_succ"),  SND_RESOURCE);
+                WinPrintf(hwnd_frame,TEXT("恭喜"), TEXT("恭喜恭喜！选关模式胜利！"));
                 return 1;
             }
 
             if (UsrLoadMode==game_mode)
             {
                 game_over=1;
-                //play_sound(stage_succ);
-                WinPrintf(hwnd_frame,TEXT("恭喜"), TEXT("恭喜恭喜！自加载模式胜利！"));
+                play_sound_async(TEXT("sd_stage_succ"),  SND_RESOURCE);
+                WinPrintf(hwnd_frame,TEXT("恭喜"), TEXT("恭喜恭喜！自加载迷题胜利！"));
+                return 1;
+            }
+
+            if (EmptyMode==game_mode)
+            {
+                game_over=1;
+                play_sound_async(TEXT("sd_stage_succ"),  SND_RESOURCE);
+                WinPrintf(hwnd_frame,TEXT("恭喜"), TEXT("恭喜恭喜！空棋盘模式胜利！"));
                 return 1;
             }
 
             if (cur_stage_idx==nr_stages)
             {
                 game_over=1;
-                //play_sound(all_stages_succ);
+                play_sound_async(TEXT("sd_all_stages_succ"),  SND_RESOURCE);
                 WinPrintf(hwnd_frame,TEXT("恭喜"), TEXT("恭喜恭喜！闯关模式通关！"));
                 return 1;
             }
 
             if (!game_over)
             {
-                //play_sound(stage_succ);
+                play_sound_async(TEXT("sd_stage_succ"),  SND_RESOURCE);
                 WinPrintf(hwnd_frame,TEXT("恭喜"), TEXT("恭喜恭喜！闯入下一关！"));
                 step_to_next_stage();
                 InvalidateRect(hwnd_main_board, NULL, TRUE);
@@ -800,6 +810,7 @@ int stage_mode_begin()
 
 }
 
+
 void toolbar_redo_undo_init()
 {
     if (!can_un_do())
@@ -811,6 +822,83 @@ void toolbar_redo_undo_init()
         set_toolbar_button(IDT_TOOLBAR_REDO, 0);
     else
         set_toolbar_button(IDT_TOOLBAR_REDO, 1);
+
+}
+
+void load_puzzle(char *output, char *file_path)
+{
+    char buf[128]={0};
+    int cnt = 0;
+    char *pchar;
+
+    FILE *fp=fopen(file_path,"r");
+    if (NULL==fp) return;
+
+    while (cnt<81)
+    {
+        fgets(buf, sizeof(buf), fp);
+        pchar = buf;
+        while ((*pchar)!=0)
+        {
+            if ((*pchar) == '.' || ((*pchar) >= '1' && (*pchar) <= '9'))
+            {
+                output[cnt] = *pchar;
+                cnt++;
+            }
+            pchar++;
+        }
+    }
+
+    output[cnt] = 0;
+    fclose(fp);
+
+}
+
+void load_puzzle_as_game(char *file_path)
+{
+    game_mode=UsrLoadMode;
+    game_over=0;
+    load_puzzle(cur_stage, file_path);
+    InitNewGame(cur_stage);
+    refresh_board();
+
+    update_statusbar();
+
+    KillTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT) ;
+    game_use_time = 0;
+    game_left_time = 7*DAY_SEC;
+    update_statusbar_time();
+
+    SetTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT, 1000, NULL);
+}
+
+void SaveAsPuzzle(char *file_path)
+{
+    int i=0, j;
+    int row, col;
+    char buf[128]={0};
+
+    FILE *fp = fopen(file_path, "w");
+
+    for (row=0; row<MAX_ROW_NUM; row++)
+    {
+        i=0;
+        for (col=0; col<MAX_COL_NUM; col++)
+        {
+            if (grid_has_value(pt_board, row, col))
+                buf[i] = grid_value(pt_board, row, col);
+            else
+                buf[i] = NO_VALUE_CHAR;
+
+            i++;
+
+        }
+        buf[i] = 0;
+        fputs(buf, fp);
+        fputs("\r\n", fp);
+    }
+   
+    fclose(fp);
 
 }
 
@@ -927,6 +1015,65 @@ void LoadArch(char *file_path)
 
 }
 
+void select_empty_game()
+{
+    game_mode=EmptyMode;
+    game_over=0;
+    cur_stage_idx=0;
+    InitNewGame(empty_stage);
+    refresh_board();
+
+    update_statusbar();
+
+    KillTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT) ;
+    game_use_time = 0;
+    game_left_time = 7*DAY_SEC;
+    update_statusbar_time();
+
+    SetTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT, 1000, NULL);
+
+}
+
+void select_stage(int stage_idx)
+{
+    game_mode=FreeMode;
+    game_over=0;
+    cur_stage_idx=stage_idx;
+    load_stage(cur_stage, cur_stage_idx);
+    InitNewGame(cur_stage);
+    refresh_board();
+
+    update_statusbar();
+
+    KillTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT) ;
+    game_use_time = 0;
+    game_left_time = 7*DAY_SEC;
+    update_statusbar_time();
+
+    SetTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT, 1000, NULL);
+}
+
+void gen_stage_menus(int stage_num)
+{
+    int i;
+    char field_value[MAX_FILE_PATH_LEN];
+    char    menu_name[MAX_FILE_PATH_LEN + 8];
+    
+    HMENU hMenu = GetMenu(hwnd_frame);
+                hMenu = GetSubMenu(hMenu, 0);
+                hMenu = GetSubMenu(hMenu, 1);
+
+        DeleteMenu(hMenu, 0, MF_BYPOSITION);
+
+
+
+    for (i=1; i<=stage_num; i++)
+    {
+        sprintf(menu_name, "&%d  第 %d 关", i, i);
+        AppendMenu(hMenu, MF_STRING, ID_STAGE_1+i-1,  menu_name) ;
+    }
+
+}
 
 LRESULT CALLBACK main_board_WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -943,6 +1090,7 @@ LRESULT CALLBACK main_board_WndProc (HWND hwnd, UINT message, WPARAM wParam, LPA
         {
             int i,j;
             InitStageNum();
+            gen_stage_menus(nr_stages);
 
             hwnd_main_board = hwnd;
 

@@ -216,6 +216,15 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         case 	WM_COMMAND:
             hMenu = GetMenu (hwnd) ;
             item_id = LOWORD(wParam);
+
+            if (item_id>=ID_STAGE_1 && item_id < ID_STAGE_1+MAX_STAGE_NUM)
+            {
+
+                select_stage(item_id - ID_STAGE_1 + 1);
+
+                return 0 ;
+
+            }
             switch (item_id)
             {
                 case    IDM_APP_ABOUT:
@@ -335,6 +344,36 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
        				return 0 ;
                 }
 
+                case    IDM_SOUND:
+                {
+                    if (is_sound_enabled())
+                        disable_sound();
+                    else
+                        enable_sound();
+
+                    CheckMenuItem(hMenu, item_id, (is_sound_enabled())?MF_CHECKED:MF_UNCHECKED);
+
+       				return 0 ;
+                }
+
+                case    IDM_MUSIC:
+                {
+                    if (play_music)
+                    {
+                        play_music = 0;
+                        mciSendString("stop music", NULL, 0, 0);
+                    }
+                    else
+                    {
+                        play_music = 1;
+                        mciSendString("play music repeat", NULL, 0, 0);
+                    }
+
+                    CheckMenuItem(hMenu, item_id, (play_music)?MF_CHECKED:MF_UNCHECKED);
+
+       				return 0 ;
+                }
+
                 case    IDT_TOOLBAR_TIMER:
                 {
                     display_time = !display_time;
@@ -344,7 +383,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
        		        return 0 ;
                 }
                 
-                case    IDM_FILE_SAVE_AS:
+                case    IDM_ARCH_SAVE:
                 {
                         ret=get_save_file_name(file_to_open, hwnd, DOC_FILE_FILTER, DOC_FILE_SUFFIX);
                         if (ret) return 0 ;
@@ -352,18 +391,39 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                        	return 0 ;
                 }
                 
+                case    IDM_SAVE_AS_PUZZLE:
+                {
+                        ret=get_save_file_name(file_to_open, hwnd, "数独迷题(*.""sdpzl"")\0*.""sdpzl""\0\0", "sdpzl");
+                        if (ret) return 0 ;
+                        SaveAsPuzzle(file_to_open);
+                       	return 0 ;
+                }
 
                 case    IDM_CGMS:
                 {
                     stage_mode_begin();
                     return 0 ;
                 }
-                
-                case    IDM_FILE_OPEN:
+
+                case    IDM_EMPTY_GAME:
+                {
+                    select_empty_game();
+                    return 0 ;
+                }
+
+                case    IDM_ARCH_OPEN:
                 {
                     if (get_open_file_name(file_to_open, hwnd, DOC_FILE_FILTER))
                         return 0;
                     LoadArch(file_to_open);
+                   	return 0 ;
+                }
+
+                case    IDM_OPEN_PUZZLE:
+                {
+                    if (get_open_file_name(file_to_open, hwnd, "数独迷题(*.""sdpzl"")\0*.""sdpzl""\0\0"))
+                        return 0;
+                    load_puzzle_as_game(file_to_open);
                    	return 0 ;
                 }
 

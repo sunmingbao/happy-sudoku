@@ -43,6 +43,8 @@ static inline HANDLE launch_thread(LPTHREAD_START_ROUTINE ThreadFunc, LPVOID lpP
 
 }
 void play_sound_async(LPCTSTR pszSound,  DWORD fdwSound);
-    
+void enable_sound();
+void disable_sound();
+int  is_sound_enabled();
 #endif
 
