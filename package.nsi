@@ -14,7 +14,7 @@
 !define PRODUCT_NAME "心常乐数独小游戏"
 !define PRODUCT_NAME_EN "happy_sudoku"
 !define MAIN_PROG_NAME "happy_sudoku.exe"
-!define PRODUCT_VERSION "2.0.0"
+!define PRODUCT_VERSION "2.0.1"
 !define PRODUCT_PUBLISHER "孙明保"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\${MAIN_PROG_NAME}"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -79,7 +79,7 @@ Section "主程序" SEC01
   File "obj\${MAIN_PROG_NAME}"
   File "other_files\stages.txt"
   File "other_files\music.mp3"
-  File "other_files\music.MID"
+;  File "other_files\music.MID"
   File "release_notes.txt"
   
 ; Shortcuts
@@ -121,7 +121,7 @@ Section Uninstall
   Delete "$INSTDIR\uninst.exe"
   Delete "$INSTDIR\${MAIN_PROG_NAME}"
   Delete "$INSTDIR\stages.txt"
-  Delete "$INSTDIR\music.MID"
+;  Delete "$INSTDIR\music.MID"
   Delete "$INSTDIR\music.mp3"
   Delete "$INSTDIR\release_notes.txt"
 
