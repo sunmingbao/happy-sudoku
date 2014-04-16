@@ -240,7 +240,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                 case    IDM_GET_SOURCE:
                 ShellExecute(NULL, "open"
-                    , "https://sourceforge.net/projects/happy-sudoku/files/v1.x/"
+                    , "https://sourceforge.net/projects/happy-sudoku/files/v2.x/"
                     , NULL, NULL, SW_SHOWNORMAL);
 
                	return 0 ;
