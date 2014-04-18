@@ -125,6 +125,51 @@ void get_nbs(t_pos_set *pt_pos_set, int row, int col)
     get_blk(pt_pos_set, row, col);
 }
 
+t_pos get_grid_pos_with_min_candi(t_board *pt_board)
+{
+    int min_candi_num = 10;
+    t_pos  pos;
+    int i, j;
+    t_grid *pt_grid;
+    
+    for (i = 0; i < MAX_ROW_NUM; i++)
+    {
+        for (j = 0; j < MAX_COL_NUM; j++)
+        {
+            if (grid_has_value(pt_board, i, j))
+                continue;
+            
+            pt_grid = &(pt_board->at_grid[i][j]);
+            if (pt_grid->candi_num<min_candi_num)
+            {
+                min_candi_num = pt_grid->candi_num;
+                pos = make_pos(i, j);
+            }
+
+        }
+    }
+
+    return pos;
+}
+
+t_value_set get_grid_candis(t_board *pt_board, t_pos pos)
+{
+    t_value_set  values = {0};
+    t_grid *pt_grid = &(pt_board->at_grid[pos.row][pos.col]);
+    int i;
+
+    for (i = 0; i < MAX_DIGIT_NUM; i++)
+    {
+        if (pt_grid->ac_candi[i] != NO_VALUE_CHAR)
+        {
+            values.value[values.num] = pt_grid->ac_candi[i];
+            values.num++;
+        }
+    }
+
+    return values;
+}
+
 void broad_cast_constrain(t_board *pt_board, int row, int col, char value)
 {
     t_pos_set pos_set;
@@ -308,12 +353,12 @@ void enhanced_solve(t_board *ptBoard, uint64_t max_return_num, uint64_t  *presul
     int i;
     t_board board;
         
-    //pos = get_grid_pos_with_min_candi(ptBoard);
-    //values = get_grid_candis(ptBoard, pos);
+    pos = get_grid_pos_with_min_candi(ptBoard);
+    values = get_grid_candis(ptBoard, pos);
 
     for (i=0; i<values.num; i++)
     {
-        if ((*presult_num) >= max_return_num)
+        if (max_return_num && ((*presult_num) >= max_return_num))
         return;
 
         if (need_stop) return;

@@ -97,5 +97,7 @@ extern TCHAR szTipWinClassName[];
 extern HWND    hwnd_tip;
 int register_tip_win();
 void show_tip(TCHAR *info);
+
+void resolve_puzzle(const char *input);
 #endif
 

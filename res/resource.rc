@@ -92,7 +92,7 @@ BEGIN
 
     	POPUP "终极法宝(&B)"
     	BEGIN
-    	        MENUITEM "数独求解器", 			IDM_SUDOKU_SOLVER, GRAYED
+    	        MENUITEM "数独求解器", 			IDM_SUDOKU_SOLVER
     	END
     	
     	POPUP "帮助(&H)"

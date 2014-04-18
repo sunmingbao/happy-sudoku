@@ -86,4 +86,10 @@ int is_sound_enabled()
     return sound_enabled;
 }
 
+int rand_time_range(int min, int max)
+{
+    int num = max - min + 1;
+    srand((unsigned)time(NULL));
+    return (rand() % num) + min;
+}
 

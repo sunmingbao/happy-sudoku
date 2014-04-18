@@ -46,5 +46,6 @@ void play_sound_async(LPCTSTR pszSound,  DWORD fdwSound);
 void enable_sound();
 void disable_sound();
 int  is_sound_enabled();
+int rand_time_range(int min, int max);
 #endif
 

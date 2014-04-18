@@ -427,6 +427,12 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                    	return 0 ;
                 }
 
+                case    IDM_SUDOKU_SOLVER:
+                {
+                    resolve_puzzle(".57.6........94..5.13....2......3..2..85.13..1..6..57..2....86.3..81..578...4.93.");
+                   	return 0 ;
+                }
+
                 case    ID_FILE_RECENT_FILE_BEGIN+0:
                 case    ID_FILE_RECENT_FILE_BEGIN+1:
                 case    ID_FILE_RECENT_FILE_BEGIN+2:
