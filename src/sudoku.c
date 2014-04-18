@@ -22,7 +22,7 @@ void add_pos(t_pos_set *pt_pos_set, t_pos t_pos)
     pt_pos_set->num++;
 }
 
-void static inline grid_del_candi(t_board *pt_board, int row, int col, char candi)
+void grid_del_candi(t_board *pt_board, int row, int col, char candi)
 {
     int i;
     t_grid *pt_grid = &(pt_board->at_grid[row][col]);
@@ -50,7 +50,7 @@ void static inline grid_del_candi(t_board *pt_board, int row, int col, char cand
 #endif
 }
 
-void static inline grid_set_value(t_board *pt_board, int row, int col, char value)
+void grid_set_value(t_board *pt_board, int row, int col, char value)
 {
     t_grid *pt_grid = &(pt_board->at_grid[row][col]);
     pt_grid->value = value;
@@ -210,6 +210,159 @@ void load_game(t_board *pt_board, const char *input)
         if (isdigit(input[i]))
         assign_grid(pt_board, row, col, input[i]);
     }
+}
+
+void board_to_input_str(char *buf, t_board *ptBoard)
+{
+    int i=0;
+    int row, col;
+
+    for (row=0; row<MAX_ROW_NUM; row++)
+    {
+        for (col=0; col<MAX_COL_NUM; col++)
+        {
+            if (grid_has_value(ptBoard, row, col))
+                buf[i] = grid_value(ptBoard, row, col);
+            else
+                buf[i] = NO_VALUE_CHAR;
+
+            i++;
+
+        }
+    }
+   
+    buf[i] = 0;
+
+}
+
+
+int need_stop;
+
+void stop_resolve()
+{
+    need_stop = 1;
+}
+
+void grid_del_candi_smart(t_board *pt_board, int row, int col, char candi)
+{
+    int i;
+    t_grid *pt_grid = &(pt_board->at_grid[row][col]);
+    if (UNDER_DOING != pt_board->state)  return;
+    if (grid_has_value(pt_board, row, col)) return;
+    if (!grid_has_candi(pt_board, row, col, candi)) return;
+    pt_grid->ac_candi[candi-MIN_DIGIT_CHAR] = NO_VALUE_CHAR;
+    pt_grid->candi_num--;
+    if (0==pt_grid->candi_num)
+    {
+        pt_board->state = NO_SOLUTION;
+    }
+#if 1
+    if (1==pt_grid->candi_num)
+    {
+        for (i = 0; i<MAX_DIGIT_NUM; i++)
+        {
+            if (pt_grid->ac_candi[i] != NO_VALUE_CHAR)
+            {
+                assign_grid_smart(pt_board, row, col, pt_grid->ac_candi[i]);
+                return;
+            }
+        }
+    }
+#endif
+}
+
+void broad_cast_constrain_smart(t_board *pt_board, int row, int col, char value)
+{
+    t_pos_set pos_set;
+    int i;
+    get_nbs(&pos_set, row, col);
+    for (i=0; i<pos_set.num; i++)
+    {
+        grid_del_candi_smart(pt_board
+            , pos_set.at_pos[i].row
+            , pos_set.at_pos[i].col
+            , value);
+    }
+}
+
+void assign_grid_smart(t_board *pt_board, int row, int col, char value)
+{
+    //printf("%d %d %c\n", row, col, value);
+    //t_grid *pt_grid = &(pt_board->at_grid[row][col]);
+    if (UNDER_DOING != pt_board->state)  return;
+    if (grid_has_value(pt_board, row, col)) return;
+    if (!grid_has_candi(pt_board, row, col, value))
+    {
+        pt_board->state = NO_SOLUTION;
+        return;
+    }
+    grid_set_value(pt_board, row, col, value);
+    broad_cast_constrain_smart(pt_board, row, col, value);
+
+}
+
+void enhanced_solve(t_board *ptBoard, uint64_t max_return_num, uint64_t  *presult_num, callback_for_each_result callback)
+{
+    t_pos pos;
+    t_value_set values;
+    int i;
+    t_board board;
+        
+    //pos = get_grid_pos_with_min_candi(ptBoard);
+    //values = get_grid_candis(ptBoard, pos);
+
+    for (i=0; i<values.num; i++)
+    {
+        if ((*presult_num) >= max_return_num)
+        return;
+
+        if (need_stop) return;
+
+        board = *ptBoard;
+        assign_grid(&board, pos.row, pos.col, values.value[i]);
+
+        if (board_solved(&board))
+        {
+            (*presult_num)++;
+            if (callback!=NULL)
+            {
+                callback(*presult_num, &board);
+            }
+
+            continue;
+
+        }
+        else if (board_no_solution(&board))
+        {
+            continue;
+        }
+        else
+            enhanced_solve(&board, max_return_num, presult_num, callback);
+
+    }
+}
+
+uint64_t solve(const char *input, uint64_t max_return_num, callback_for_each_result callback)
+{
+    uint64_t  result_num = 0;
+    t_board board;
+
+    need_stop = 0;
+    load_game(&board, input);
+
+    if (board_solved(&board))
+    {
+        result_num++;
+        if (callback!=NULL)
+        {
+            callback(result_num, &board);
+        }
+        return result_num;
+
+    }
+
+    enhanced_solve(&board, max_return_num, &result_num, callback);
+    return result_num;
 }
 
 #if 0

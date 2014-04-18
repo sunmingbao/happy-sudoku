@@ -12,6 +12,7 @@
 #define __SUDOKU_H_
 
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
 #define    MAX_ROW_NUM    (9)
@@ -34,6 +35,11 @@ typedef struct
     t_pos at_pos[MAX_POS_NUM];
 } t_pos_set;
 
+typedef struct
+{
+    int num;
+    char value[MAX_DIGIT_NUM+1];
+} t_value_set;
 
 
 t_pos static inline make_pos(int row, int col)
@@ -68,6 +74,12 @@ typedef enum
 } E_BOARD_STATE;
 
 void load_game(t_board *pt_board, const char *input);
+void board_to_input_str(char *buf, t_board *ptBoard);
+void stop_resolve();
+
+typedef  void (*callback_for_each_result)(uint64_t result_idx, t_board *ptBoard);
+uint64_t solve(const char *input, uint64_t max_return_num, callback_for_each_result callback);
+
 static inline char grid_value(t_board *pt_board, int row, int col)
 {
     t_grid *pt_grid = &(pt_board->at_grid[row][col]);
@@ -90,6 +102,8 @@ void assign_grid(t_board *pt_board, int row, int col, char value);
 void get_nbs(t_pos_set *pt_pos_set, int row, int col);
 int nbs_have_only_this_candi(t_board *pt_board, int row, int col, char value);
 int nbs_have_value(t_board *pt_board, int row, int col, char value);
+
+
 static inline int board_solved(t_board *pt_board)
 {
     return SUCC_DONE==pt_board->state;

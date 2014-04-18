@@ -63,6 +63,8 @@ void env_init()
     scrn_height = GetSystemMetrics(SM_CYSCREEN);
 
     reg_sys_win_classes();
+
+    srand((unsigned)time(NULL));
 }
 
 

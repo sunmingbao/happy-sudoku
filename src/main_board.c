@@ -112,28 +112,6 @@ int cur_stage_idx=1;
 int game_mode = StageMode;
 int game_over = 0;
 
-void board_to_input_str(char *buf)
-{
-    int i=0;
-    int row, col;
-
-    for (row=0; row<MAX_ROW_NUM; row++)
-    {
-        for (col=0; col<MAX_COL_NUM; col++)
-        {
-            if (grid_has_value(pt_board, row, col))
-                buf[i] = grid_value(pt_board, row, col);
-            else
-                buf[i] = NO_VALUE_CHAR;
-
-            i++;
-
-        }
-    }
-   
-    buf[i] = 0;
-
-}
 void InitStageNum()
 {
     char buf[128]={0};
@@ -323,21 +301,25 @@ void update_statusbar_time()
 
 }
 
-void do_user_input(int row, int col, char value)
+void add_rollback(int row, int col, char value)
 {
     int i;
-    gt_rb_q.at_steps[gt_rb_q.num] = *pt_board;
-    pt_board = &(gt_rb_q.at_steps[gt_rb_q.num]);
-    assign_grid(pt_board, row, col, value);
-    gt_rb_q.ac_value[gt_rb_q.num] = value;
-    gt_rb_q.at_pos[gt_rb_q.num] = make_pos(row, col);
-    gt_rb_q.num++;
-    if (gt_rb_q.ac_value[gt_rb_q.num] != NO_VALUE_CHAR)
+    if (gt_rb_q.num>=MAX_GRID_NUM)
     {
-        for (i=gt_rb_q.num;i<MAX_GRID_NUM;i++)
-            gt_rb_q.ac_value[i] = NO_VALUE_CHAR;
+        gt_board = gt_rb_q.at_steps[0];
+        for (i = 0; i<MAX_GRID_NUM-1; i++)
+            gt_rb_q.at_steps[i] = gt_rb_q.at_steps[i+1];
 
     }
+
+    
+    gt_rb_q.at_steps[gt_rb_q.num] = gt_board_tmp;
+
+    gt_rb_q.ac_value[gt_rb_q.num] = value;
+    gt_rb_q.at_pos[gt_rb_q.num] = make_pos(row, col);
+    pt_board = &(gt_rb_q.at_steps[gt_rb_q.num]);
+    gt_rb_q.num++;
+    gt_rb_q.ac_value[gt_rb_q.num] = NO_VALUE_CHAR;
 
 }
 
@@ -401,7 +383,7 @@ void unfocus_any_grid()
         refresh_grid(old_row,old_col);
 }
 
-void update_nbs(int row, int col)
+void refresh_nbs(int row, int col)
 {
             t_pos_set nbs;
             int i;
@@ -475,7 +457,7 @@ void un_do()
     }
     
     focus_grid(pt_pos->row, pt_pos->col);
-    update_nbs(pt_pos->row, pt_pos->col);
+    refresh_nbs(pt_pos->row, pt_pos->col);
 
     set_toolbar_button(IDT_TOOLBAR_REDO, 1);
     update_statusbar();
@@ -488,11 +470,10 @@ void re_do()
     pt_board=&(gt_rb_q.at_steps[gt_rb_q.num]);
     pt_pos = &(gt_rb_q.at_pos[gt_rb_q.num]);
     focus_grid(pt_pos->row, pt_pos->col);
-    update_nbs(pt_pos->row, pt_pos->col);
+    refresh_nbs(pt_pos->row, pt_pos->col);
     gt_rb_q.num++;
     set_toolbar_button(IDT_TOOLBAR_UNDO, 1);
     update_statusbar();
-
 }
 
 
@@ -540,7 +521,10 @@ void proc_digit_input(char value)
             return;
         }
 
-        do_user_input(cur_row, cur_col, char_int+'0');
+    gt_board_tmp = *pt_board;
+    assign_grid(&gt_board_tmp, cur_row, cur_col, value);
+
+        add_rollback(cur_row, cur_col, char_int+'0');
         play_sound_async(TEXT("sd_right"),  SND_RESOURCE);
         refresh_grid(cur_row,cur_col);
         set_toolbar_button(IDT_TOOLBAR_UNDO, 1);
@@ -548,7 +532,7 @@ void proc_digit_input(char value)
 
         if (2==display_help)
         {
-            update_nbs(cur_row, cur_col);
+            refresh_nbs(cur_row, cur_col);
         }
 
 
@@ -611,7 +595,7 @@ void proc_modify_input(char value)
     int    char_int = value-'0';
     char  buf[128];
 
-    board_to_input_str(buf);
+    board_to_input_str(buf, pt_board);
     buf[cur_row*9 + cur_col] = '.';
     load_game(&gt_board_tmp, buf);
 
@@ -623,86 +607,39 @@ void proc_modify_input(char value)
         if (!grid_has_candi(&gt_board_tmp, cur_row, cur_col, char_int+'0'))
         {
             //WinPrintf(hwnd_frame,TEXT("错误"), TEXT("输入数字与已有数字冲突"));
-            nbs_have_value(pt_board, cur_row, cur_col, char_int+'0');
+            nbs_have_value(&gt_board_tmp, cur_row, cur_col, char_int+'0');
             play_sound_async(TEXT("sd_wrong"),  SND_RESOURCE);
-            blink_grid(pt_board->tmp_pos.row, pt_board->tmp_pos.col);
+            blink_grid(gt_board_tmp.tmp_pos.row, gt_board_tmp.tmp_pos.col);
             return;
         }
 
-        if (nbs_have_only_this_candi(pt_board, cur_row, cur_col, char_int+'0'))
+        if (nbs_have_only_this_candi(&gt_board_tmp, cur_row, cur_col, char_int+'0'))
         {
             //WinPrintf(hwnd_frame,TEXT("错误"), TEXT("输入数字与已有数字冲突"));
             //at_grid[row][ col]->BlinkPaint(wxT("0"));
             play_sound_async(TEXT("sd_wrong"),  SND_RESOURCE);
-            blink_grid(pt_board->tmp_pos.row, pt_board->tmp_pos.col);
+            blink_grid(gt_board_tmp.tmp_pos.row, gt_board_tmp.tmp_pos.col);
             return;
         }
 
-        do_user_input(cur_row, cur_col, char_int+'0');
+        assign_grid(&gt_board_tmp, cur_row, cur_col, value);
+        add_rollback(cur_row, cur_col, char_int+'0');
+
         play_sound_async(TEXT("sd_right"),  SND_RESOURCE);
-        refresh_grid(cur_row,cur_col);
+        refresh_nbs(cur_row, cur_col);
         set_toolbar_button(IDT_TOOLBAR_UNDO, 1);
         update_statusbar();
 
         if (2==display_help)
         {
-            update_nbs(cur_row, cur_col);
+            refresh_nbs(cur_row, cur_col);
         }
-
-
-        //if (UsrDefMode==game_mode) return;
-#if 1
-        if (board_solved(pt_board))
-        {
-            KillTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT) ;
-
-            if (FreeMode==game_mode)
-            {
-                game_over=1;
-                play_sound_async(TEXT("sd_stage_succ"),  SND_RESOURCE);
-                WinPrintf(hwnd_frame,TEXT("恭喜"), TEXT("恭喜恭喜！选关模式胜利！"));
-                return 1;
-            }
-
-            if (UsrLoadMode==game_mode)
-            {
-                game_over=1;
-                play_sound_async(TEXT("sd_stage_succ"),  SND_RESOURCE);
-                WinPrintf(hwnd_frame,TEXT("恭喜"), TEXT("恭喜恭喜！自加载迷题胜利！"));
-                return 1;
-            }
-
-            if (EmptyMode==game_mode)
-            {
-                game_over=1;
-                play_sound_async(TEXT("sd_stage_succ"),  SND_RESOURCE);
-                WinPrintf(hwnd_frame,TEXT("恭喜"), TEXT("恭喜恭喜！空棋盘模式胜利！"));
-                return 1;
-            }
-
-            if (cur_stage_idx==nr_stages)
-            {
-                game_over=1;
-                play_sound_async(TEXT("sd_all_stages_succ"),  SND_RESOURCE);
-                WinPrintf(hwnd_frame,TEXT("恭喜"), TEXT("恭喜恭喜！闯关模式通关！"));
-                return 1;
-            }
-
-            if (!game_over)
-            {
-                play_sound_async(TEXT("sd_stage_succ"),  SND_RESOURCE);
-                WinPrintf(hwnd_frame,TEXT("恭喜"), TEXT("恭喜恭喜！闯入下一关！"));
-                step_to_next_stage();
-                InvalidateRect(hwnd_main_board, NULL, TRUE);
-            }
-        }
-#endif
-
 
 
     }
 
 }
+
 TCHAR szGridWinClassName[] = TEXT ("grid_win") ;
 LRESULT CALLBACK grid_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -986,7 +923,7 @@ void SaveAsPuzzle(char *file_path)
 
     FILE *fp = fopen(file_path, "w");
 
-    board_to_input_str(buf);
+    board_to_input_str(buf, pt_board);
 
     for (i=0; i<MAX_ROW_NUM; i++)
     {
@@ -1037,17 +974,24 @@ void SaveAsArch(char *file_path)
     fputs("\r\n", fp);
     sprintf(buf, "finish_grid_num=%d \r\n", gt_rb_q.num);
     fputs(buf, fp);
-    for (i=0;i<gt_rb_q.num;i++)
+
+    for (row=0; row<MAX_ROW_NUM; row++)
+        for (col=0; col<MAX_COL_NUM; col++)
     {
-        row = gt_rb_q.at_pos[i].row;
-        col = gt_rb_q.at_pos[i].col;
+
+        if (grid_has_value(pt_board, row, col)
+            &&at_grid[row][col].input_by_user)
+            {
         sprintf(buf, "%d %d %c\r\n"
             , row
             , col
             ,grid_value(pt_board, row, col));
         fputs(buf, fp);
 
+            }
+
     }
+
 
     fclose(fp);
     update_file_open_history(file_path);
@@ -1095,8 +1039,7 @@ void LoadArch(char *file_path)
     {
         fgets(buf, sizeof(buf), fp);
         sscanf(buf, "%d %d %c\r\n", &row, &col, &value);
-        focus_grid(row, col);
-        do_user_input(row, col, value);
+        assign_grid(pt_board, row, col, value);
     }
 
     fclose(fp);
