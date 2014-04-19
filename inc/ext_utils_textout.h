@@ -24,5 +24,9 @@ void fw_text_out_full_trans(HDC hdc, int x, int y, int height
 int fw_text_get_char_width(int height);
 void fw_text_out_middle_trans(HDC hdc, RECT *rect, int height
     ,COLORREF fg, TCHAR *text, int len);
+
+HFONT  create_font(int height);
+void create_app_fonts();
+extern HFONT h_font_32_px;
 #endif
 

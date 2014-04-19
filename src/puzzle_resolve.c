@@ -15,6 +15,7 @@
 #include "global_symbols.h"
 #include "sudoku.h"
 #include "res.h"
+#include "ext_utils_textout.h"
 
 FILE *fp_solve_result;
 uint64_t result_num;
@@ -75,6 +76,8 @@ BOOL CALLBACK ResolvePuzzleWaitDlgProc(HWND hDlg, UINT message,WPARAM wParam, LP
                     hDlg_resolve_puzzle_wait = hDlg;
                     center_child_win(hwnd_frame, hDlg);
                     SetWindowText(hDlg, "求解迷题");
+                    SendMessage(GetDlgItem(hDlg, IDC_FIXED_INFO), WM_SETFONT, (WPARAM)h_font_32_px, 0);
+                    SendMessage(GetDlgItem(hDlg, IDC_VAR_INFO), WM_SETFONT, (WPARAM)h_font_32_px, 0);
                     SetDlgItemText(hDlg, IDC_FIXED_INFO, "已求得解的数目: ");
                     set_int_text(GetDlgItem(hDlg_resolve_puzzle_wait, IDC_VAR_INFO), 0);
                     launch_thread(do_resolve_puzzle, NULL);
@@ -126,7 +129,7 @@ BOOL CALLBACK PuzzleInputDlgProc(HWND hDlg, UINT message,WPARAM wParam, LPARAM l
  	{
          	case 	WM_INITDIALOG :
                     center_child_win(hwnd_frame, hDlg);
-                    SendMessage(GetDlgItem(hDlg, ID_PUZZLE_INPUT), WM_SETFONT, (WPARAM)GetStockObject(SYSTEM_FIXED_FONT), 0);
+                    SendMessage(GetDlgItem(hDlg, ID_PUZZLE_INPUT), WM_SETFONT, (WPARAM)h_font_32_px, 0);
                     SetDlgItemText(hDlg, ID_PUZZLE_INPUT, puzzle_to_resolve_hm);
               		return FALSE ;
 
@@ -167,6 +170,7 @@ BOOL CALLBACK PuzzleInputDlgProc(HWND hDlg, UINT message,WPARAM wParam, LPARAM l
 
               		case 	IDCANCEL :
            				EndDialog (hDlg, IDCANCEL) ;
+
            				return TRUE ;
             }
             

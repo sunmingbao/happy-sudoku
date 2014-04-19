@@ -54,7 +54,7 @@ BOOL CALLBACK IntSelectDlgProc(HWND hDlg, UINT message,WPARAM wParam, LPARAM lPa
                     SetWindowText(hDlg, g_cap);
                     SetDlgItemText(hDlg, IDC_FIXED_INFO, g_tip);
                     init_int_list_comb(GetDlgItem(hDlg, ID_INT_LIST_COMB));
-                    SendMessage(GetDlgItem(hDlg, ID_INT_LIST_COMB), CB_SETCURSEL, 2, (LPARAM)0);
+                    SendMessage(GetDlgItem(hDlg, ID_INT_LIST_COMB), CB_SETCURSEL, 39, (LPARAM)0);
               		return FALSE ;
 
 

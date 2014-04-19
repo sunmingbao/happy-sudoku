@@ -110,3 +110,27 @@ void fw_text_out_middle_trans(HDC hdc, RECT *rect, int height
     DeleteObject(SelectObject(hdc, h_old_font)) ;
 }
 
+
+HFONT  create_font(int height)
+{
+    HFONT  h_font;
+    LOGFONT lf ;
+    
+    memset(&lf, 0, sizeof(lf));
+    lf.lfCharSet = 1;
+
+    lf.lfHeight = height;
+    lf.lfPitchAndFamily = FIXED_PITCH;
+    lf.lfWeight  = FW_BLACK;
+
+    
+    h_font = CreateFontIndirect(&lf);
+
+    return h_font;
+}
+
+HFONT h_font_32_px;
+void create_app_fonts()
+{
+    h_font_32_px = create_font(32);
+}

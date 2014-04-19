@@ -34,6 +34,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     register_input_grid_win();
     register_tip_win();
 
+    create_app_fonts();
     create_windows(iCmdShow);
 
  	hAccel = LoadAccelerators (hInstance, TEXT("MY_ACCELER")) ;

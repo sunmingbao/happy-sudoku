@@ -15,6 +15,7 @@
 #include "global_symbols.h"
 #include "sudoku.h"
 #include "res.h"
+#include "ext_utils_textout.h"
 
 void generate_digit_sequence(char *output)
 {
@@ -128,6 +129,9 @@ BOOL CALLBACK GenPuzzleWaitDlgProc(HWND hDlg, UINT message,WPARAM wParam, LPARAM
                     hDlg_gen_puzzle_wait = hDlg;
                     center_child_win(hwnd_frame, hDlg);
                     SetWindowText(hDlg, "生成迷题");
+                    SendMessage(GetDlgItem(hDlg, IDC_FIXED_INFO), WM_SETFONT, (WPARAM)h_font_32_px, 0);
+                    SendMessage(GetDlgItem(hDlg, IDC_VAR_INFO), WM_SETFONT, (WPARAM)h_font_32_px, 0);
+
                     SetDlgItemText(hDlg, IDC_FIXED_INFO, "正在生成迷题，请稍后");
                     SetTimer(hDlg, TIMER_GEN_PUZZLE_WAIT, TIMER_GEN_PUZZLE_WAIT_GAP, NULL);
                     launch_thread(do_generate_puzzle, NULL);

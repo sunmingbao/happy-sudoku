@@ -65,6 +65,7 @@ void env_init()
     reg_sys_win_classes();
 
     srand((unsigned)time(NULL));
+
 }
 
 
