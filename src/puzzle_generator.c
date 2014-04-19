@@ -89,18 +89,90 @@ void random_del_some_inputs()
     
 }
 
-void generate_puzzle(char *output)
+int stop_gen_puzzle;
+HWND hDlg_gen_puzzle_wait;
+DWORD WINAPI  do_generate_puzzle(LPVOID lpParameter)
 {
     uint64_t result_num = 0;
     char buf[128];
 
+    stop_gen_puzzle = 0;
+
     while (0==result_num)
     {
+        if (stop_gen_puzzle)
+        {
+            return 0;
+        }
+        
         generate_init_input(buf);
         result_num = solve(buf, 1, for_each_result);
     }
 
     random_del_some_inputs();
-    strcpy(output, generated_input);
+    SendMessage(hDlg_gen_puzzle_wait, WM_COMMAND, IDOK, 0);
+    return 0;
+}
+
+BOOL CALLBACK GenPuzzleWaitDlgProc(HWND hDlg, UINT message,WPARAM wParam, LPARAM lParam)
+{
+    static int timer_msg_cnt = 0;
+    char dots[8];
+
+ 	switch (message)
+ 	{
+         	case 	WM_INITDIALOG :
+                    hDlg_gen_puzzle_wait = hDlg;
+                    center_child_win(hwnd_frame, hDlg);
+                    //SetDlgItemText(hDlg, ID_ABOUT_INFO, info);
+                    SetTimer(hDlg, TIMER_GEN_PUZZLE_WAIT, TIMER_GEN_PUZZLE_WAIT_GAP, NULL);
+                    launch_thread(do_generate_puzzle, NULL);
+              		return FALSE ;
+
+            case WM_TIMER:
+            {
+                timer_msg_cnt = (timer_msg_cnt+1)%7;
+                memcpy(dots, "......", timer_msg_cnt);
+                dots[timer_msg_cnt] = 0;
+                SetDlgItemText(hDlg, IDC_DOTS, dots);
+                
+                
+                return TRUE ;
+            }
+
+            case 	WM_CLOSE:
+       				SendMessage(hDlg, WM_COMMAND, IDCANCEL, 0);
+       				return TRUE ;
+
+         	case 	WM_COMMAND :
+      		switch (LOWORD (wParam))
+      		{
+
+              		case 	IDOK :
+                        KillTimer (hDlg, TIMER_GEN_PUZZLE_WAIT);
+                        EndDialog (hDlg, IDOK) ;
+           				return TRUE ;
+
+              		case 	IDCANCEL :
+                        stop_gen_puzzle = 1;
+                        stop_resolve();
+                        KillTimer (hDlg, TIMER_GEN_PUZZLE_WAIT);
+           				EndDialog (hDlg, IDCANCEL) ;
+           				return TRUE ;
+            }
+            
+            break ;
+     }
+  	return FALSE ;
+}
+
+int generate_puzzle(char *output)
+{
+    int ret = DialogBox(g_hInstance, TEXT("GEN_PUZZLE_WAIT_DLG"), hwnd_frame, GenPuzzleWaitDlgProc);
+
+    if (IDOK==ret)
+        strcpy(output, generated_input);
+
+    return ret;
 }
 

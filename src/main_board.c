@@ -98,7 +98,7 @@ char empty_stage[] =
 ".........";
 
 char cur_stage[82];
-
+char tmp_stage[82];
 enum
 {
     StageMode = 1000,
@@ -1075,13 +1075,15 @@ void select_empty_game()
 
 void LoadRandGame()
 {
+    if (generate_puzzle(tmp_stage)==IDCANCEL)
+        return;
+
     game_mode=RandomMode;
     game_over=0;
     cur_stage_idx=0;
 
-    generate_puzzle(cur_stage);
 
-    InitNewGame(cur_stage);
+    InitNewGame(tmp_stage);
     refresh_board();
 
     update_statusbar();

@@ -36,6 +36,9 @@ extern int scrn_height; /* ÆÁÄ»¸ß¶È */
 #define TIMER_TIP_WIN_LAST    4
 #define TIMER_TIP_WIN_LAST_GAP 500
 
+#define TIMER_GEN_PUZZLE_WAIT    5
+#define TIMER_GEN_PUZZLE_WAIT_GAP 500
+
 int register_frame();
 void set_frame_title(TCHAR *file_name);
 
@@ -100,6 +103,6 @@ int register_tip_win();
 void show_tip(TCHAR *info);
 
 void resolve_puzzle(const char *input);
-void generate_puzzle(char *output);
+int generate_puzzle(char *output);
 #endif
 
