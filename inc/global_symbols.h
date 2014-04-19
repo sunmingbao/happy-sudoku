@@ -76,6 +76,7 @@ void SaveAsArch(char *file_path);
 void SaveAsPuzzle(char *file_path);
 void load_puzzle_as_game(char *file_path);
 void LoadArch(char *file_path);
+void game_to_hm_str(char * output);
 extern int display_help;
 extern int display_time;
 extern int play_music;
@@ -102,7 +103,7 @@ extern HWND    hwnd_tip;
 int register_tip_win();
 void show_tip(TCHAR *info);
 
-void get_puzzle_and_resolve();
+void get_puzzle_and_resolve(char *input);
 int generate_puzzle(char *output);
 #endif
 

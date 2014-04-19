@@ -54,3 +54,7 @@
 
 #define IDC_FIXED_INFO               (41000)
 #define IDC_VAR_INFO                 (41001)
+
+#define ID_PUZZLE_INPUT              (41002)
+#define ID_IMPORT_FROM_FILE          (41003)
+

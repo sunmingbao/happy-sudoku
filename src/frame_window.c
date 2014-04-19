@@ -66,7 +66,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     POINT point;
     RECT		rect ;
     int  item_id;
-    
+    char buf[256];
     int ret;
 
     switch (message)
@@ -436,7 +436,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                 case    IDM_SUDOKU_SOLVER:
                 {
-                    get_puzzle_and_resolve();
+                    game_to_hm_str(buf);
+                    get_puzzle_and_resolve(buf);
                    	return 0 ;
                 }
 

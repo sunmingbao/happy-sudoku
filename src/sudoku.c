@@ -255,6 +255,32 @@ void assign_grid(t_board *pt_board, int row, int col, char value)
 
 }
 
+int format_input(char *output, char *input)
+{
+    int cnt = 0;
+    char *pchar = input;
+
+
+
+        while ((*pchar)!=0)
+        {
+            if ((*pchar) == '.' || ((*pchar) >= '1' && (*pchar) <= '9'))
+            {
+                output[cnt] = *pchar;
+                cnt++;
+
+                if (cnt>=81) break;
+            }
+            pchar++;
+        }
+
+
+    output[cnt] = 0;
+
+    return cnt>=81;
+
+}
+
 void load_game(t_board *pt_board, const char *input)
 {
     int i,j;

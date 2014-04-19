@@ -19,6 +19,7 @@
 FILE *fp_solve_result;
 uint64_t result_num;
 static char puzzle_to_resolve[82]; 
+static char puzzle_to_resolve_hm[256]; 
 HWND hDlg_resolve_puzzle_wait;
 
 static void for_each_result(uint64_t result_idx, t_board *ptBoard)
@@ -111,17 +112,79 @@ void resolve_puzzle(const char *input)
     if (result_num>0)
     ShellExecute(NULL, "open"
                     , "result.txt"
-                    , NULL, NULL, SW_SHOWNORMAL);
+                    , NULL, NULL, SW_SHOWMAXIMIZED);
 
 }
 
-
-void get_puzzle_and_resolve()
+BOOL CALLBACK PuzzleInputDlgProc(HWND hDlg, UINT message,WPARAM wParam, LPARAM lParam)
 {
-    int ret = DialogBox(g_hInstance, TEXT("GEN_PUZZLE_WAIT_DLG"), hwnd_frame, ResolvePuzzleWaitDlgProc);
+    char buf[1024];
+    char puzzle_file_path[MAX_FILE_PATH_LEN];
+    FILE *fp;
+
+    switch (message)
+ 	{
+         	case 	WM_INITDIALOG :
+                    center_child_win(hwnd_frame, hDlg);
+                    SendMessage(GetDlgItem(hDlg, ID_PUZZLE_INPUT), WM_SETFONT, (WPARAM)GetStockObject(SYSTEM_FIXED_FONT), 0);
+                    SetDlgItemText(hDlg, ID_PUZZLE_INPUT, puzzle_to_resolve_hm);
+              		return FALSE ;
+
+
+            case 	WM_CLOSE:
+       				SendMessage(hDlg, WM_COMMAND, IDCANCEL, 0);
+       				return TRUE ;
+
+         	case 	WM_COMMAND :
+      		switch (LOWORD (wParam))
+      		{
+      		        case    ID_IMPORT_FROM_FILE:
+                    {
+                        if (get_open_file_name(puzzle_file_path, hDlg, "数独迷题(*.""sdpzl"")\0*.""sdpzl""\0\0"))
+                        return 0;
+
+                        fp=fopen(puzzle_file_path,"r");
+                        fread(buf, 1, sizeof(buf),  fp );
+                        fclose(fp);
+                        SetDlgItemText(hDlg, ID_PUZZLE_INPUT, buf);
+                        return TRUE ;
+
+
+                    }
+
+              		case 	IDOK :
+
+                        GetDlgItemText(hDlg, ID_PUZZLE_INPUT, buf, sizeof(buf));
+
+                        if (!format_input(puzzle_to_resolve, buf))
+                        {
+                            WinPrintf(hDlg, "错误", "迷题输入非法");
+                            return TRUE ;
+                        }
+                        
+                        EndDialog (hDlg, IDOK) ;
+           				return TRUE ;
+
+              		case 	IDCANCEL :
+           				EndDialog (hDlg, IDCANCEL) ;
+           				return TRUE ;
+            }
+            
+            break ;
+     }
+  	return FALSE ;
+}
+
+
+void get_puzzle_and_resolve(char *input)
+{
+    int ret;
+
+    strcpy(puzzle_to_resolve_hm, input);
+    ret = DialogBox(g_hInstance, TEXT("PUZZLE_INPUT_DLG"), hwnd_frame, PuzzleInputDlgProc);
 
     if (IDCANCEL==ret) return;
     
-    resolve_puzzle("");
+    resolve_puzzle(puzzle_to_resolve);
 
 }

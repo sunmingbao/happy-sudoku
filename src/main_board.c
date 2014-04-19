@@ -914,6 +914,26 @@ void load_puzzle_as_game(char *file_path)
     SetTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT, 1000, NULL);
 }
 
+void game_to_hm_str(char * output)
+{
+    int i;
+    char buf[128];
+    char buf_2[16] = {0};
+    output[0] = 0;
+
+    buf_2[9] = '\r';
+    buf_2[10] = '\n';
+
+    board_to_input_str(buf, pt_board);
+
+    for (i=0; i<MAX_ROW_NUM; i++)
+    {
+        memcpy(buf_2, buf+i*9, 9);
+        strcat(output, buf_2);
+    }
+
+}
+
 void SaveAsPuzzle(char *file_path)
 {
     int i;

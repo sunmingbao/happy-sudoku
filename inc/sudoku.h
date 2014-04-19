@@ -90,7 +90,7 @@ void stop_resolve();
 
 typedef  void (*callback_for_each_result)(uint64_t result_idx, t_board *ptBoard);
 uint64_t solve(const char *input, uint64_t max_return_num, callback_for_each_result callback);
-
+int format_input(char *output, char *input);
 static inline char grid_value(t_board *pt_board, int row, int col)
 {
     t_grid *pt_grid = &(pt_board->at_grid[row][col]);
