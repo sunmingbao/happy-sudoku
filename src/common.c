@@ -93,6 +93,12 @@ int rand_time_range(int min, int max)
     return (rand() % num) + min;
 }
 
+int rand_range(int min, int max)
+{
+    int num = max - min + 1;
+    return (rand() % num) + min;
+}
+
 void set_int_text(HWND hwnd, int value)
 {
     char info[32];

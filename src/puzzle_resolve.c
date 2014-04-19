@@ -31,7 +31,7 @@ static void for_each_result(uint64_t result_idx, t_board *ptBoard)
 
     result_num++;
 
-    sprintf(buf, "第 %d 个解\n", (int)result_idx);
+    sprintf(buf, "[%03lu]\n", (unsigned long)result_idx);
     fputs(buf, fp_solve_result);
 
     board_to_input_str(buf, ptBoard);
@@ -58,7 +58,7 @@ DWORD WINAPI  do_resolve_puzzle(LPVOID lpParameter)
 
     solve(puzzle_to_resolve, 0, for_each_result);
 
-    sprintf(buf, "全部解的个数: %-22d", (int)result_num);
+    sprintf(buf, "全部解的个数: %-22lu", (unsigned long)result_num);
     rewind(fp_solve_result);
     fputs(buf, fp_solve_result);
 

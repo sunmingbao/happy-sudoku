@@ -569,7 +569,7 @@ void proc_digit_input(char value)
             {
                 game_over=1;
                 play_sound_async(TEXT("sd_all_stages_succ"),  SND_RESOURCE);
-                WinPrintf(hwnd_frame,TEXT("¹§Ï²"), TEXT("¹§Ï²¹§Ï²£¡%s Í¨¹Ø£¡"), mode_str(game_mode));
+                WinPrintf(hwnd_frame,TEXT("¹§Ï²"), TEXT("ÄãÌ«Å£ÁË£¡%s Í¨¹Ø£¡"), mode_str(game_mode));
                 return 1;
             }
 
@@ -947,8 +947,8 @@ void SaveAsPuzzle(char *file_path)
     for (i=0; i<MAX_ROW_NUM; i++)
     {
         memcpy(buf_2, buf+i*9, 9);
-        fputs(buf, fp);
-        fputs("\r\n", fp);
+        fputs(buf_2, fp);
+        fputs("\n", fp);
     }
    
     fclose(fp);

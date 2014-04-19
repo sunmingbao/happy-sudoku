@@ -21,21 +21,26 @@ void generate_digit_sequence(char *output)
 {
     /* 这里不需要乱序。
     因为generate_pos_sequence摇出的位置集是乱序的。*/
-    strcpy(output, "123456987");
+    strcpy(output, "123456789");
 }
 
 
 t_pos_set generate_pos_sequence()
 {
     t_pos_set  pos_set = {0};
-
+    int row, col;
     t_pos  pos;
 
     while (pos_set.num < 9)
     {
-        pos = make_pos(rand_time_range(0, 8), rand_time_range(0, 8));
+        row = rand_range(0, 8);
+        col = rand_range(0, 8);
+        pos = make_pos(row, col);
         if (pos_set_has_pos(&pos_set, &pos))
+        {
+            //DbgPrintf("qqq %d %d", pos.row, pos.col);
             continue;
+        }
         
         add_pos(&pos_set, pos);
        
@@ -52,11 +57,13 @@ void generate_init_input(char *output)
     t_board board;
     char buf[10];
     t_pos_set  pos_set;
-    
+    //DbgPrintf("generate_init_input");
     init_board(&board);
 
     generate_digit_sequence(buf);
+    //DbgPrintf("2");
     pos_set = generate_pos_sequence();
+    //DbgPrintf("generate_pos_sequence");
     
     for (i=0;i<pos_set.num; i++)
     {
@@ -65,7 +72,7 @@ void generate_init_input(char *output)
             , pos_set.at_pos[i].col
             , buf[i]);
     }
-
+//DbgPrintf("4");
     board_to_input_str(output, &board);
 }
 
@@ -83,7 +90,7 @@ void del_some_inputs()
 
     while (del_num)
     {
-        idx = rand_time_range(0, 80);
+        idx = rand_range(0, 80);
         if (isdigit(generated_input[idx]))
         {
             generated_input[idx] = '.';
@@ -101,6 +108,7 @@ DWORD WINAPI  do_generate_puzzle(LPVOID lpParameter)
     char buf[128];
 
     stop_gen_puzzle = 0;
+    srand((unsigned)time(NULL));
 
     while (0==result_num)
     {
@@ -109,6 +117,8 @@ DWORD WINAPI  do_generate_puzzle(LPVOID lpParameter)
             return 0;
         }
         
+        //DbgPrintf("generate_init_input");
+
         generate_init_input(buf);
         result_num = solve(buf, 1, for_each_result);
     }

@@ -15,7 +15,7 @@
 
 //用户修改-begin --->
 #define    APP_NAME       "心常乐数独小游戏"
-#define    APP_VERSION    {'2','0','2','0'}
+#define    APP_VERSION    {'2','1','0','0'}
 
 #define    szAuthor    TEXT("孙明保")
 #define    szCompany   TEXT("ZTE中兴")

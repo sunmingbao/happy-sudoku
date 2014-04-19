@@ -29,7 +29,7 @@ static inline int AskConfirmation_3state(HWND hwnd, TCHAR *str, const TCHAR *cap
 }
 
 int WinPrintf(HWND hwnd, TCHAR *cap, TCHAR * szFormat, ...);
-
+int DbgPrintf(TCHAR * szFormat, ...);
 
 static inline void err_info_box(HWND hparent, TCHAR *info)
 {

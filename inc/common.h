@@ -47,6 +47,7 @@ void enable_sound();
 void disable_sound();
 int  is_sound_enabled();
 int rand_time_range(int min, int max);
+int rand_range(int min, int max);
 void set_int_text(HWND hwnd, int value);
 #endif
 

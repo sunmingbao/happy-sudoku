@@ -35,6 +35,22 @@ int WinPrintf(HWND hwnd, TCHAR *cap, TCHAR * szFormat, ...)
 	return MessageBox (hwnd, szBuffer, cap, 0) ;
 }
 
+int DbgPrintf(TCHAR * szFormat, ...)
+{
+	TCHAR   szBuffer [1024] ;
+	va_list pArgList ;
+
+
+
+	va_start (pArgList, szFormat) ;
+
+	_vsntprintf (	szBuffer, sizeof (szBuffer) / sizeof (TCHAR), 
+			szFormat, pArgList) ;
+
+	va_end (pArgList) ;
+	return MessageBox (NULL, szBuffer, "debug", 0) ;
+}
+
 int get_save_file_name(char *file_name, HWND hwnd, char *filter, char *ext)
 {
     TCHAR szFile[MAX_FILE_PATH_LEN]=TEXT("");

@@ -391,7 +391,7 @@ void enhanced_solve(t_board *ptBoard, uint64_t max_return_num, uint64_t  *presul
     t_value_set values;
     int i;
     t_board board;
-        
+//DbgPrintf("enhanced_solve");
     pos = get_grid_pos_with_min_candi(ptBoard);
     values = get_grid_candis(ptBoard, pos);
 
