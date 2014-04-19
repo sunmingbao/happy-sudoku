@@ -74,7 +74,7 @@ static void for_each_result(uint64_t result_idx, t_board *ptBoard)
 
 void random_del_some_inputs()
 {
-    int del_num = rand_time_range(30, 45);
+    int del_num = rand_time_range(40, 50);
     int idx;
 
     while (del_num)
@@ -124,7 +124,8 @@ BOOL CALLBACK GenPuzzleWaitDlgProc(HWND hDlg, UINT message,WPARAM wParam, LPARAM
          	case 	WM_INITDIALOG :
                     hDlg_gen_puzzle_wait = hDlg;
                     center_child_win(hwnd_frame, hDlg);
-                    //SetDlgItemText(hDlg, ID_ABOUT_INFO, info);
+                    SetWindowText(hDlg, "生成迷题");
+                    SetDlgItemText(hDlg, IDC_FIXED_INFO, "正在生成迷题，请稍后");
                     SetTimer(hDlg, TIMER_GEN_PUZZLE_WAIT, TIMER_GEN_PUZZLE_WAIT_GAP, NULL);
                     launch_thread(do_generate_puzzle, NULL);
               		return FALSE ;
@@ -134,7 +135,7 @@ BOOL CALLBACK GenPuzzleWaitDlgProc(HWND hDlg, UINT message,WPARAM wParam, LPARAM
                 timer_msg_cnt = (timer_msg_cnt+1)%7;
                 memcpy(dots, "......", timer_msg_cnt);
                 dots[timer_msg_cnt] = 0;
-                SetDlgItemText(hDlg, IDC_DOTS, dots);
+                SetDlgItemText(hDlg, IDC_VAR_INFO, dots);
                 
                 
                 return TRUE ;

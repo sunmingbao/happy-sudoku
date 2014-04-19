@@ -102,7 +102,7 @@ extern HWND    hwnd_tip;
 int register_tip_win();
 void show_tip(TCHAR *info);
 
-void resolve_puzzle(const char *input);
+void get_puzzle_and_resolve();
 int generate_puzzle(char *output);
 #endif
 

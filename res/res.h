@@ -52,4 +52,5 @@
 #define ID_STAGE_1        40800
 #define MAX_STAGE_NUM     100
 
-#define IDC_DOTS                 (41000)
+#define IDC_FIXED_INFO               (41000)
+#define IDC_VAR_INFO                 (41001)

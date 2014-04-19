@@ -228,6 +228,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             switch (item_id)
             {
                 case    IDM_APP_ABOUT:
+                    
                 DialogBox (g_hInstance, TEXT("ABOUTBOX"), hwnd, AboutDlgProc) ;
                	return 0 ;
 
@@ -435,7 +436,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                 case    IDM_SUDOKU_SOLVER:
                 {
-                    resolve_puzzle(".57.6........94..5.13....2......3..2..85.13..1..6..57..2....86.3..81..578...4.93.");
+                    get_puzzle_and_resolve();
                    	return 0 ;
                 }
 
