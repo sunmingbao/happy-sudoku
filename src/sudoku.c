@@ -22,6 +22,19 @@ void add_pos(t_pos_set *pt_pos_set, t_pos t_pos)
     pt_pos_set->num++;
 }
 
+int pos_set_has_pos(t_pos_set *pt_pos_set, t_pos *pt_pos)
+{
+    int i;
+    for (i=0; i<pt_pos_set->num; i++)
+    {
+        if (pos_equal(&(pt_pos_set->at_pos[i]), pt_pos))
+            return 1;
+
+    }
+
+    return 0;
+}
+
 void grid_del_candi(t_board *pt_board, int row, int col, char candi)
 {
     int i;

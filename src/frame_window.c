@@ -419,6 +419,12 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                    	return 0 ;
                 }
 
+                case    IDM_RAND_GAME:
+                {
+                    LoadRandGame();
+                   	return 0 ;
+                }
+
                 case    IDM_OPEN_PUZZLE:
                 {
                     if (get_open_file_name(file_to_open, hwnd, " ˝∂¿√‘Ã‚(*.""sdpzl"")\0*.""sdpzl""\0\0"))

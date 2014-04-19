@@ -68,6 +68,7 @@ int register_main_board_win();
 int stage_mode_begin();
 void select_stage(int stage_idx);
 void select_empty_game();
+void LoadRandGame();
 void SaveAsArch(char *file_path);
 void SaveAsPuzzle(char *file_path);
 void load_puzzle_as_game(char *file_path);
@@ -99,5 +100,6 @@ int register_tip_win();
 void show_tip(TCHAR *info);
 
 void resolve_puzzle(const char *input);
+void generate_puzzle(char *output);
 #endif
 

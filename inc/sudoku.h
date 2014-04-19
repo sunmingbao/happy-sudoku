@@ -50,6 +50,17 @@ t_pos static inline make_pos(int row, int col)
     return tmp_pos;
 }
 
+static inline int  pos_equal(t_pos *pt_pos1, t_pos *pt_pos2)
+{
+
+    return (pt_pos1->row==pt_pos2->row) && (pt_pos1->col==pt_pos2->col);
+}
+
+void add_pos(t_pos_set *pt_pos_set, t_pos t_pos);
+
+int pos_set_has_pos(t_pos_set *pt_pos_set, t_pos *pt_pos);
+
+
 
 typedef struct
 {

@@ -18,7 +18,7 @@
 
 FILE *fp_solve_result;
 uint64_t result_num;
-void for_each_result(uint64_t result_idx, t_board *ptBoard)
+static void for_each_result(uint64_t result_idx, t_board *ptBoard)
 {
     char buf[128];
     char buf_2[128]={0};
@@ -39,7 +39,6 @@ void for_each_result(uint64_t result_idx, t_board *ptBoard)
     }
 
     fputs("\n", fp_solve_result);
-    WinPrintf(hwnd_frame, "result", "%d",(int)result_idx);
 }
 
 void resolve_puzzle(const char *input)
@@ -56,6 +55,10 @@ void resolve_puzzle(const char *input)
     fputs(buf, fp_solve_result);
 
     fclose(fp_solve_result);
-    WinPrintf(hwnd_frame, "OK", "OK");
+
+    ShellExecute(NULL, "open"
+                    , "result.txt"
+                    , NULL, NULL, SW_SHOWNORMAL);
+
 }
 

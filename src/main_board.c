@@ -105,7 +105,22 @@ enum
     FreeMode,
     UsrLoadMode,
     EmptyMode,
+    RandomMode,
 };
+
+const char *mode_names[] = 
+{
+"闯关模式", 
+"选关模式",
+"自加载迷题",
+"空棋盘模式",
+"随机模式",
+};
+
+const char * mode_str(int mode)
+{
+    return mode_names[mode - StageMode];
+}
 
 int nr_stages;
 int cur_stage_idx=1;
@@ -258,15 +273,14 @@ void update_statusbar()
     
     char info[128];
     if (StageMode==game_mode)
-    sprintf(info, "闯关模式: %d关/%d关"
+    sprintf(info, "%s: %d关/%d关"
+        , mode_str(game_mode)
         ,cur_stage_idx
         ,nr_stages);
     else if (FreeMode==game_mode)
-        sprintf(info, "选关模式: 第 %d 关", cur_stage_idx);
-    else if (UsrLoadMode==game_mode)
-        sprintf(info, "自加载迷题");
-    else if (EmptyMode==game_mode)
-        sprintf(info, "空棋盘模式");
+        sprintf(info, "%s: 第 %d 关", mode_str(game_mode), cur_stage_idx);
+    else
+        sprintf(info, "%s", mode_str(game_mode));
 
     SendMessage(hwnd_statusbar, SB_SETTEXT,0, (LPARAM)info); 
 
@@ -542,35 +556,20 @@ void proc_digit_input(char value)
         {
             KillTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT) ;
 
-            if (FreeMode==game_mode)
+            if (StageMode!=game_mode)
             {
                 game_over=1;
                 play_sound_async(TEXT("sd_stage_succ"),  SND_RESOURCE);
-                WinPrintf(hwnd_frame,TEXT("恭喜"), TEXT("恭喜恭喜！选关模式胜利！"));
+                WinPrintf(hwnd_frame,TEXT("恭喜"), TEXT("恭喜恭喜！%s 胜利！"), mode_str(game_mode));
                 return 1;
             }
 
-            if (UsrLoadMode==game_mode)
-            {
-                game_over=1;
-                play_sound_async(TEXT("sd_stage_succ"),  SND_RESOURCE);
-                WinPrintf(hwnd_frame,TEXT("恭喜"), TEXT("恭喜恭喜！自加载迷题胜利！"));
-                return 1;
-            }
-
-            if (EmptyMode==game_mode)
-            {
-                game_over=1;
-                play_sound_async(TEXT("sd_stage_succ"),  SND_RESOURCE);
-                WinPrintf(hwnd_frame,TEXT("恭喜"), TEXT("恭喜恭喜！空棋盘模式胜利！"));
-                return 1;
-            }
 
             if (cur_stage_idx==nr_stages)
             {
                 game_over=1;
                 play_sound_async(TEXT("sd_all_stages_succ"),  SND_RESOURCE);
-                WinPrintf(hwnd_frame,TEXT("恭喜"), TEXT("恭喜恭喜！闯关模式通关！"));
+                WinPrintf(hwnd_frame,TEXT("恭喜"), TEXT("恭喜恭喜！%s 通关！"), mode_str(game_mode));
                 return 1;
             }
 
@@ -1074,6 +1073,27 @@ void select_empty_game()
 
 }
 
+void LoadRandGame()
+{
+    game_mode=RandomMode;
+    game_over=0;
+    cur_stage_idx=0;
+
+    generate_puzzle(cur_stage);
+
+    InitNewGame(cur_stage);
+    refresh_board();
+
+    update_statusbar();
+
+    KillTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT) ;
+    game_use_time = 0;
+    game_left_time = 7*DAY_SEC;
+    update_statusbar_time();
+
+    SetTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT, 1000, NULL);
+
+}
 void select_stage(int stage_idx)
 {
     game_mode=FreeMode;

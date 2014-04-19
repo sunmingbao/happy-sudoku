@@ -44,7 +44,7 @@ BEGIN
 				    MENUITEM "&1 abc",                       ID_STAGE_1
 			    END
 
-    	        MENUITEM "随机生成游戏", 		             IDM_RAND_GAME, GRAYED
+    	        MENUITEM "随机生成游戏", 		             IDM_RAND_GAME
     	        MENUITEM "空棋盘",                           IDM_EMPTY_GAME
 
     	        MENUITEM SEPARATOR
