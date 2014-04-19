@@ -18,6 +18,8 @@
 
 void generate_digit_sequence(char *output)
 {
+    /* 这里不需要乱序。
+    因为generate_pos_sequence摇出的位置集是乱序的。*/
     strcpy(output, "123456987");
 }
 
@@ -72,9 +74,10 @@ static void for_each_result(uint64_t result_idx, t_board *ptBoard)
     board_to_input_str(generated_input, ptBoard);
 }
 
-void random_del_some_inputs()
+static int  init_grid_num;
+void del_some_inputs()
 {
-    int del_num = rand_time_range(40, 50);
+    int del_num = 81 - init_grid_num;
     int idx;
 
     while (del_num)
@@ -109,7 +112,7 @@ DWORD WINAPI  do_generate_puzzle(LPVOID lpParameter)
         result_num = solve(buf, 1, for_each_result);
     }
 
-    random_del_some_inputs();
+    del_some_inputs();
     SendMessage(hDlg_gen_puzzle_wait, WM_COMMAND, IDOK, 0);
     return 0;
 }
@@ -169,7 +172,13 @@ BOOL CALLBACK GenPuzzleWaitDlgProc(HWND hDlg, UINT message,WPARAM wParam, LPARAM
 
 int generate_puzzle(char *output)
 {
-    int ret = DialogBox(g_hInstance, TEXT("GEN_PUZZLE_WAIT_DLG"), hwnd_frame, GenPuzzleWaitDlgProc);
+    int ret;
+
+    ret = select_int_value("预置数字格子数", "", 1, 78, &init_grid_num);
+
+    if (IDOK!=ret) return ret;
+
+    ret = DialogBox(g_hInstance, TEXT("GEN_PUZZLE_WAIT_DLG"), hwnd_frame, GenPuzzleWaitDlgProc);
 
     if (IDOK==ret)
         strcpy(output, generated_input);

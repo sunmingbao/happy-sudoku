@@ -228,7 +228,6 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             switch (item_id)
             {
                 case    IDM_APP_ABOUT:
-                    
                 DialogBox (g_hInstance, TEXT("ABOUTBOX"), hwnd, AboutDlgProc) ;
                	return 0 ;
 

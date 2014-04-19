@@ -57,4 +57,4 @@
 
 #define ID_PUZZLE_INPUT              (41002)
 #define ID_IMPORT_FROM_FILE          (41003)
-
+#define ID_INT_LIST_COMB             (41004)
