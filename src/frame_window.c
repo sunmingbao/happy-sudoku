@@ -48,12 +48,10 @@ void set_frame_title(TCHAR *file_name)
 
 void open_file()
 {
-    //if (doc_save_proc()) return;
-
-    load_doc_file(file_to_open);;
-    strcpy(doc_file_path, file_to_open);
-    set_frame_title(strrchr(doc_file_path, '\\')+1);
-    update_file_open_history(doc_file_path);
+    if (strstr(file_to_open, ".sdpzl")!=NULL)
+        load_puzzle_as_game(file_to_open);
+    else if (strstr(file_to_open, ".sdk")!=NULL)
+        LoadArch(file_to_open);
 }
 
 
