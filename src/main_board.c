@@ -216,14 +216,33 @@ void refresh_board()
             refresh_grid(i, j);
 }
 
+void init_new_game_gui(int clear_game_time)
+{
+    refresh_board();
+
+    update_statusbar();
+
+    if (clear_game_time)
+    {
+        game_use_time = 0;
+        game_left_time = 7*DAY_SEC;
+    }
+    update_statusbar_time();
+
+    SetTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT, 1000, NULL);
+    toolbar_redo_undo_init();
+}
+
 void InitNewGame(const char *input)
 {
     int i;
     int row, col;
 
-cur_row = cur_col = -1;
-pt_board = &gt_board;
-load_game(pt_board, input);
+    KillTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT);
+
+    cur_row = cur_col = -1;
+    pt_board = &gt_board;
+    load_game(pt_board, input);
 
     init_rb_q(&gt_rb_q);
 
@@ -239,6 +258,7 @@ load_game(pt_board, input);
 
         strcpy(at_grid[row][col].mark, "123456789 ");
     }
+
 
 }
 
@@ -487,17 +507,7 @@ void step_to_next_stage()
     cur_stage_idx++;
     load_stage(cur_stage, cur_stage_idx);
     InitNewGame(cur_stage);
-    refresh_board();
-
-    update_statusbar();
-
-    KillTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT) ;
-    game_use_time = 0;
-    game_left_time = 7*DAY_SEC;
-    update_statusbar_time();
-
-    SetTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT, 1000, NULL);
-
+    init_new_game_gui(1);
 }
 
 void proc_digit_input(char value)
@@ -892,16 +902,7 @@ void load_puzzle_as_game(char *file_path)
     game_over=0;
     load_puzzle(cur_stage, file_path);
     InitNewGame(cur_stage);
-    refresh_board();
-
-    update_statusbar();
-
-    KillTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT) ;
-    game_use_time = 0;
-    game_left_time = 7*DAY_SEC;
-    update_statusbar_time();
-
-    SetTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT, 1000, NULL);
+    init_new_game_gui(1);
 }
 
 void game_to_hm_str(char * output)
@@ -1040,6 +1041,7 @@ void LoadArch(char *file_path)
 
     fgets(buf, sizeof(buf), fp);
     InitNewGame(buf);
+    init_new_game_gui(0);
 
     fgets(buf, sizeof(buf), fp);
     sscanf(buf, "finish_grid_num=%d \r\n", &nr_input);
@@ -1053,12 +1055,6 @@ void LoadArch(char *file_path)
 
     fclose(fp);
 
-    refresh_board();
-    toolbar_redo_undo_init();
-    update_statusbar();
-    update_statusbar_time();
-
-    SetTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT, 1000, NULL);
     
     update_file_open_history(file_path);
 
@@ -1070,16 +1066,7 @@ void select_empty_game()
     game_over=0;
     cur_stage_idx=0;
     InitNewGame(empty_stage_str);
-    refresh_board();
-
-    update_statusbar();
-
-    KillTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT) ;
-    game_use_time = 0;
-    game_left_time = 7*DAY_SEC;
-    update_statusbar_time();
-
-    SetTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT, 1000, NULL);
+    init_new_game_gui(1);
 
 }
 
@@ -1094,17 +1081,7 @@ void LoadRandGame()
 
 
     InitNewGame(tmp_stage);
-    refresh_board();
-
-    update_statusbar();
-
-    KillTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT) ;
-    game_use_time = 0;
-    game_left_time = 7*DAY_SEC;
-    update_statusbar_time();
-
-    SetTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT, 1000, NULL);
-
+    init_new_game_gui(1);
 }
 void select_stage(int stage_idx)
 {
@@ -1113,16 +1090,7 @@ void select_stage(int stage_idx)
     cur_stage_idx=stage_idx;
     load_stage(cur_stage, cur_stage_idx);
     InitNewGame(cur_stage);
-    refresh_board();
-
-    update_statusbar();
-
-    KillTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT) ;
-    game_use_time = 0;
-    game_left_time = 7*DAY_SEC;
-    update_statusbar_time();
-
-    SetTimer(hwnd_main_board, TIMER_GAME_USE_TIME_CNT, 1000, NULL);
+    init_new_game_gui(1);
 }
 
 void gen_stage_menus(int stage_num)
