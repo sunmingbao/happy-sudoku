@@ -14,6 +14,17 @@
 #include <assert.h>
 #include "sudoku.h"
 
+const char empty_stage_str[] =
+"........."
+"........."
+"........."
+"........."
+"........."
+"........."
+"........."
+"........."
+".........";
+
 void add_pos(t_pos_set *pt_pos_set, t_pos t_pos)
 {
     assert(pt_pos_set->num<MAX_POS_NUM);

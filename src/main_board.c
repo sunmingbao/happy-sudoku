@@ -86,16 +86,6 @@ void *get_grid_info(HWND hwnd)
     return NULL;
 }
 
-char empty_stage[] =
-"........."
-"........."
-"........."
-"........."
-"........."
-"........."
-"........."
-"........."
-".........";
 
 char cur_stage[82];
 char tmp_stage[82];
@@ -1079,7 +1069,7 @@ void select_empty_game()
     game_mode=EmptyMode;
     game_over=0;
     cur_stage_idx=0;
-    InitNewGame(empty_stage);
+    InitNewGame(empty_stage_str);
     refresh_board();
 
     update_statusbar();

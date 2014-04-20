@@ -52,28 +52,20 @@ t_pos_set generate_pos_sequence()
 
 void generate_init_input(char *output)
 {
-    int i,j;
-    int row, col;
-    t_board board;
+    int i;
+    t_pos pos;
     char buf[10];
     t_pos_set  pos_set;
-    //DbgPrintf("generate_init_input");
-    init_board(&board);
 
     generate_digit_sequence(buf);
-    //DbgPrintf("2");
     pos_set = generate_pos_sequence();
     //DbgPrintf("generate_pos_sequence");
-    
+    strcpy(output, empty_stage_str);
     for (i=0;i<pos_set.num; i++)
     {
-        assign_grid(&board
-            , pos_set.at_pos[i].row
-            , pos_set.at_pos[i].col
-            , buf[i]);
+        pos = pos_set.at_pos[i];
+        output[pos.row*9 + pos.col] =  buf[i];
     }
-//DbgPrintf("4");
-    board_to_input_str(output, &board);
 }
 
 char generated_input[128];
@@ -120,7 +112,7 @@ DWORD WINAPI  do_generate_puzzle(LPVOID lpParameter)
         //DbgPrintf("generate_init_input");
 
         generate_init_input(buf);
-        result_num = solve(buf, 1, for_each_result);
+        result_num = solve(buf, rand_range(1, 256), for_each_result);
     }
 
     del_some_inputs();

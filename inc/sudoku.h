@@ -125,6 +125,6 @@ static inline int board_no_solution(t_board *pt_board)
     return NO_SOLUTION==pt_board->state;
 }
 
-
+extern const char empty_stage_str[];
 #endif
 
