@@ -361,6 +361,8 @@ int register_input_grid_win()
 
 }
 
+#define    GAP_SIZE    (2)
+
 void mov_input_win_to_grid(int row, int col)
 {
     RECT		rect ;
@@ -368,18 +370,28 @@ void mov_input_win_to_grid(int row, int col)
     
     get_grid_rect(&rect, row, col);
 
-    rect.left -= 5;
-    rect.top  -= 5;
-    rect.right  += 5;
-    rect.bottom += 5;
-
+    rect.left -= GAP_SIZE;
+    rect.top  -= GAP_SIZE;
+    rect.right  += GAP_SIZE;
+    rect.bottom += GAP_SIZE;
+#if 1
     MoveWindow(hwnd_input_board, 	
         rect.left,  
         rect.top, 
         rect.right - rect.left, 
         rect.bottom - rect.top, 
         TRUE);
-
+#else
+SetWindowPos(
+hwnd_input_board,
+HWND_TOP,
+        rect.left,  
+        rect.top, 
+        rect.right - rect.left, 
+        rect.bottom - rect.top, 
+SWP_HIDEWINDOW
+);
+#endif
 }
 
 void display_input_win(int row, int col)

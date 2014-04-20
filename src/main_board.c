@@ -26,7 +26,7 @@ int display_help = 1;
 int display_time = 1;
 int play_music = 1;
 
-#define    GAP_SIZE    (5)
+#define    GAP_SIZE    (2)
 static int win_size, grid_size, big_font_size, small_font_size;
 
 #define    COLOUR_NO_VALUE         RGB(0x55,0xaa,0x55)
@@ -335,11 +335,11 @@ void get_grid_rect(RECT *rect, int i, int j)
     xLeft = GAP_SIZE + (GAP_SIZE+grid_size)*j;
     yTop  = GAP_SIZE + (GAP_SIZE+grid_size)*i;
 
-    if (i>=3) yTop+=GAP_SIZE;
-    if (i>=6) yTop+=GAP_SIZE;
+    if (i>=3) yTop+=2*GAP_SIZE+1;
+    if (i>=6) yTop+=2*GAP_SIZE+1;
 
-    if (j>=3) xLeft+=GAP_SIZE;
-    if (j>=6) xLeft+=GAP_SIZE;
+    if (j>=3) xLeft+=2*GAP_SIZE+1;
+    if (j>=6) xLeft+=2*GAP_SIZE+1;
 
     xRight  = xLeft+grid_size;
     yBottom = yTop+grid_size;
@@ -1209,7 +1209,7 @@ LRESULT CALLBACK main_board_WndProc (HWND hwnd, UINT message, WPARAM wParam, LPA
       		cxClient = LOWORD (lParam) ;
       		cyClient = HIWORD (lParam) ;
             win_size = cxClient;
-            grid_size = (win_size - GAP_SIZE*12)/9;
+            grid_size = (win_size - GAP_SIZE*14)/9;
             big_font_size = grid_size;
             small_font_size = grid_size/3;
             
@@ -1348,7 +1348,7 @@ int register_main_board_win()
     sub_wndclass.hInstance  = g_hInstance;
     sub_wndclass.hIcon      = NULL;
     sub_wndclass.hCursor    = LoadCursor (NULL, IDC_ARROW);
-    sub_wndclass.hbrBackground  = (HBRUSH)CreateSolidBrush(GetSysColor(COLOR_ACTIVECAPTION));
+    sub_wndclass.hbrBackground  = (HBRUSH)CreateSolidBrush(RGB(0x2a,0x2a,0xff));
     sub_wndclass.lpszMenuName   = NULL;
     sub_wndclass.lpszClassName  = szMainBoardWinClassName;
 
