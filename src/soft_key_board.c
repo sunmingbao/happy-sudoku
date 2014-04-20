@@ -361,7 +361,6 @@ int register_input_grid_win()
 
 }
 
-#define    GAP_SIZE    (2)
 
 void mov_input_win_to_grid(int row, int col)
 {

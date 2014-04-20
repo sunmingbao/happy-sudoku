@@ -137,7 +137,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                 cxClient, toolbar_height, TRUE) ;
 
              main_board_size = (upper_win_height>cxClient)?cxClient:upper_win_height;
-             main_board_size = ((main_board_size-30)/9)*9 + 30;
+             main_board_size = ((main_board_size-GAP_SIZE_TOTAL)/9)*9 
+                + GAP_SIZE_TOTAL;
              //main_board_size -= 5;
 
              MoveWindow	(	hwnd_main_board, 	

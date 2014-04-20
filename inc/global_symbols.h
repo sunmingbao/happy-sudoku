@@ -107,5 +107,9 @@ void get_puzzle_and_resolve(char *input);
 int generate_puzzle(char *output);
 
 int select_int_value(char *CAP, char *tip, int min, int max, int *presult);
+
+#define    GAP_SIZE          (3)
+#define    GAP_SIZE_BLOCK    (10)
+#define    GAP_SIZE_TOTAL    (GAP_SIZE*8 + GAP_SIZE_BLOCK*2)
 #endif
 

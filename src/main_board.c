@@ -26,7 +26,7 @@ int display_help = 1;
 int display_time = 1;
 int play_music = 1;
 
-#define    GAP_SIZE    (2)
+
 static int win_size, grid_size, big_font_size, small_font_size;
 
 #define    COLOUR_NO_VALUE         RGB(0x55,0xaa,0x55)
@@ -36,6 +36,8 @@ static int win_size, grid_size, big_font_size, small_font_size;
 
 #define    COLOUR_BLINK_1          RGB(0x00,0x00,0x00)
 #define    COLOUR_BLINK_2          RGB(0xff,0xff,0xff)
+
+#define    COLOR_MARK_DIGIT        RGB(0xff,0xff,0xff)
 
 HBRUSH hBrush_NO_VALUE, hBrush_HAS_VALUE, hBrush_INPUT_BY_USER, hBrush_ON_FOCUS;
 HBRUSH hBrush_BLINK_1, hBrush_BLINK_2;
@@ -355,11 +357,11 @@ void get_grid_rect(RECT *rect, int i, int j)
     xLeft = GAP_SIZE + (GAP_SIZE+grid_size)*j;
     yTop  = GAP_SIZE + (GAP_SIZE+grid_size)*i;
 
-    if (i>=3) yTop+=2*GAP_SIZE+1;
-    if (i>=6) yTop+=2*GAP_SIZE+1;
+    if (i>=3) yTop+=(GAP_SIZE_BLOCK-GAP_SIZE);
+    if (i>=6) yTop+=(GAP_SIZE_BLOCK-GAP_SIZE);
 
-    if (j>=3) xLeft+=2*GAP_SIZE+1;
-    if (j>=6) xLeft+=2*GAP_SIZE+1;
+    if (j>=3) xLeft+=(GAP_SIZE_BLOCK-GAP_SIZE);
+    if (j>=6) xLeft+=(GAP_SIZE_BLOCK-GAP_SIZE);
 
     xRight  = xLeft+grid_size;
     yBottom = yTop+grid_size;
@@ -677,10 +679,18 @@ LRESULT CALLBACK grid_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
             char str[32];
             HBRUSH hBrush;
 
+            COLORREF text_color = RGB(0x0, 0x0, 0x0);
+
             SetRect(&rect, 0, 0, grid_size, grid_size);
 
             if (pt_grid_info->hBrush != NULL)
+            {
                 hBrush = pt_grid_info->hBrush;
+                if (hBrush==hBrush_BLINK_1)
+                    text_color = COLOUR_BLINK_2;
+                else
+                    text_color = COLOUR_BLINK_1;
+            }
             else if (grid_on_focus(row, col))
                 hBrush = hBrush_ON_FOCUS;
             else if (grid_has_value(pt_board, row, col))
@@ -702,21 +712,27 @@ LRESULT CALLBACK grid_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
             {
                 sprintf(str, "%c", pt_board->at_grid[row][col].value);
 
+                if (pt_grid_info->hBrush == NULL)
+                    text_color = RGB(0x0,0x0,0x0);
+
                 fw_text_out_middle_trans(hdc
-                    , &rect, big_font_size, RGB(0x0,0x0,0x0)
+                    , &rect, big_font_size, text_color
                     , str, 1);
             }
             else if (2==display_help)
             {
+                if (pt_grid_info->hBrush == NULL)
+                    text_color = RGB(0x0,0x0,0x0);
+
                 sprintf(str, "%s ", pt_board->at_grid[row][col].ac_candi);
                 SetRect(&rect, 0, 0, grid_size, grid_size/2);
                 fw_text_out_middle_trans(hdc
-                    , &rect, small_font_size, RGB(0x0,0x0,0x0)
+                    , &rect, small_font_size, text_color
                     , str, 5);
 
                 SetRect(&rect, 0, grid_size/2, grid_size, grid_size);
                 fw_text_out_middle_trans(hdc
-                    , &rect, small_font_size, RGB(0x0,0x0,0x0)
+                    , &rect, small_font_size, text_color
                     , str+5, 5);
 
             }
@@ -724,14 +740,17 @@ LRESULT CALLBACK grid_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
                 pt_grid_info->input_by_user &&
                 strcmp(pt_grid_info->mark, "123456789 ") )
             {
+               if (pt_grid_info->hBrush == NULL)
+                    text_color = COLOR_MARK_DIGIT;
+
                 SetRect(&rect, 0, 0, grid_size, grid_size/2);
                 fw_text_out_middle_trans(hdc
-                    , &rect, small_font_size, RGB(0xff,0xff,0xff)
+                    , &rect, small_font_size, text_color
                     , pt_grid_info->mark, 5);
 
                 SetRect(&rect, 0, grid_size/2, grid_size, grid_size);
                 fw_text_out_middle_trans(hdc
-                    , &rect, small_font_size, RGB(0xff,0xff,0xff)
+                    , &rect, small_font_size, text_color
                     , pt_grid_info->mark+5, 5);
 
             }
@@ -1177,7 +1196,7 @@ LRESULT CALLBACK main_board_WndProc (HWND hwnd, UINT message, WPARAM wParam, LPA
       		cxClient = LOWORD (lParam) ;
       		cyClient = HIWORD (lParam) ;
             win_size = cxClient;
-            grid_size = (win_size - GAP_SIZE*14)/9;
+            grid_size = (win_size - GAP_SIZE_TOTAL)/9;
             big_font_size = grid_size;
             small_font_size = grid_size/3;
             
