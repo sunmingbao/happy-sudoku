@@ -39,7 +39,7 @@ void resize_window(HWND hwnd)
 void set_frame_title(TCHAR *file_name)
 {
     TCHAR info[128];
-    sprintf(info, TEXT("%s (%s)"), szAppName, file_name);
+    sprintf(info, TEXT("%s    (%s)"), szAppName, file_name);
     SetWindowText(hwnd_frame, info);
 
 }

@@ -195,6 +195,12 @@ void input_win_paint(HDC hdc, RECT *rect, t_input_grid_info *pt_grid_info)
 
 }
 
+void hide_input_window()
+{
+    ShowWindow(hwnd_input_board, 0);
+    refresh_grid_on_focus();
+}
+
 LRESULT CALLBACK input_grid_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     HDC hdc ;
@@ -255,8 +261,7 @@ LRESULT CALLBACK input_grid_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
             {
                 if (is_last_input_grid(row, col))
                 {
-                    ShowWindow(hwnd_input_board, 0);
-
+                    hide_input_window();
                 }
                 else
                 {
@@ -275,7 +280,7 @@ LRESULT CALLBACK input_grid_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
             {
                 if (!no_input_grid_on_focus())
                 {
-                    ShowWindow(hwnd_input_board, 0);
+                    hide_input_window();
                     SendMessage(hwnd_main_board, WM_CHAR, focus_grid_char(), NULL);
                 }
 
@@ -285,7 +290,7 @@ LRESULT CALLBACK input_grid_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
 
             if (input_grid_on_focus(row, col))
             {
-                ShowWindow(hwnd_input_board, 0);
+                hide_input_window();
                 SendMessage(hwnd_main_board, WM_CHAR, focus_grid_char(), NULL);
                 return 0;
             }
@@ -311,7 +316,7 @@ LRESULT CALLBACK input_grid_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
             {
                 if (!no_input_grid_on_focus())
                 {
-                    ShowWindow(hwnd_input_board, 0);
+                    hide_input_window();
                     SendMessage(hwnd_main_board, WM_CHAR, focus_grid_char(), NULL);
                 }
 
@@ -319,7 +324,7 @@ LRESULT CALLBACK input_grid_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
 
             }
 
-            ShowWindow(hwnd_input_board, 0);
+            hide_input_window();
             SendMessage(hwnd_main_board, WM_CHAR, focus_grid_char(), NULL);
 
             return 0;

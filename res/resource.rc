@@ -27,6 +27,7 @@ tb_icon_redo_dis     ICON "redo_dis.ico"
 tb_icon_hint         ICON "hint.ico"
 tb_icon_mark         ICON "pen.ico"
 tb_icon_timer        ICON "timer.ico"
+sd_notify            WAVE "notify.wav"
 sd_right             WAVE "right.wav"
 sd_wrong             WAVE "wrong.wav"
 sd_no_solution       WAVE "no_solution.wav"
@@ -38,18 +39,18 @@ MY_MENU MENU DISCARDABLE
 BEGIN
     	POPUP "游戏(&G)"
     	BEGIN
-    	        MENUITEM "闯关模式(&N)\tCtrl+N", 		     IDM_CGMS
+    	        MENUITEM "闯关模式\tCtrl+N", 		     IDM_CGMS
     	        POPUP "选关模式"
 			    BEGIN
 				    MENUITEM "&1 abc",                       ID_STAGE_1
 			    END
 
-    	        MENUITEM "随机生成游戏", 		             IDM_RAND_GAME
-    	        MENUITEM "空棋盘",                           IDM_EMPTY_GAME
+    	        MENUITEM "随机生成游戏(&R)", 		             IDM_RAND_GAME
+    	        MENUITEM "空棋盘(&E)",                           IDM_EMPTY_GAME
 
     	        MENUITEM SEPARATOR
     	        
-    	        MENUITEM "当前进度存档(&A)...\tCtrl+S",  IDM_ARCH_SAVE
+    	        MENUITEM "当前进度存档(&S)...\tCtrl+S",  IDM_ARCH_SAVE
     	        MENUITEM "打开存档(&O)...\tCtrl+O", 	 IDM_ARCH_OPEN
     	        POPUP "最近的存档"
 			    BEGIN
@@ -78,11 +79,11 @@ BEGIN
     	        MENUITEM "显示标记(&M)\tCtrl+M", 			IDT_TOOLBAR_MARK, CHECKED
     	        
     	        MENUITEM SEPARATOR
-    	        MENUITEM "显示计时(&T)\tCtrl+T", 			IDT_TOOLBAR_TIMER, CHECKED
+    	        MENUITEM "显示计时\tCtrl+T", 			IDT_TOOLBAR_TIMER, CHECKED
     	        
     	        MENUITEM SEPARATOR
-    	        MENUITEM "音效(&T)", 				    IDM_SOUND, CHECKED
-        		MENUITEM "背景音乐(&S)", 				IDM_MUSIC, CHECKED
+    	        MENUITEM "音效", 				    IDM_SOUND, CHECKED
+        		MENUITEM "背景音乐", 				IDM_MUSIC, CHECKED
 
     	        MENUITEM SEPARATOR
     	        MENUITEM "工具栏(&T)", 				IDM_APP_TOOLBAR_WIN, CHECKED
@@ -92,7 +93,7 @@ BEGIN
 
     	POPUP "终极法宝(&B)"
     	BEGIN
-    	        MENUITEM "数独求解器", 			IDM_SUDOKU_SOLVER
+    	        MENUITEM "数独求解器(&S)", 			IDM_SUDOKU_SOLVER
     	END
     	
     	POPUP "帮助(&H)"

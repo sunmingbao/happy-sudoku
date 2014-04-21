@@ -394,6 +394,10 @@ void refresh_grid(int row, int col)
     refresh_window(at_grid[row][col].hwnd);
 }
 
+void refresh_grid_on_focus()
+{
+    refresh_grid(cur_row, cur_col);
+}
 
 void unfocus_any_grid()
 {
@@ -1231,25 +1235,34 @@ LRESULT CALLBACK main_board_WndProc (HWND hwnd, UINT message, WPARAM wParam, LPA
             ShowWindow(hwnd_input_board, 0);
             if (no_grid_on_focus())
             {
+                play_sound_async(TEXT("sd_notify"),  SND_RESOURCE);
                 show_tip(TEXT("请先选中一个方格"));
                 return 0;
             }
             if (wParam<'1' || wParam>'9')
             {
-                WinPrintf(hwnd, TEXT("提醒"), TEXT("请输入数字1~9"));
+                play_sound_async(TEXT("sd_notify"),  SND_RESOURCE);
+                show_tip(TEXT("请输入数字 1~9"));
                 return 0;
             }
             
             if (board_solved(pt_board))
             {
+                play_sound_async(TEXT("sd_notify"),  SND_RESOURCE);
                 WinPrintf(hwnd_frame,TEXT("提醒"), TEXT("游戏已经结束"));
+                return 0;
+            }
+
+            if (at_grid[cur_row][cur_col].input_by_user==0)
+            {
+                play_sound_async(TEXT("sd_notify"),  SND_RESOURCE);
+                show_tip(TEXT("本方格为预置数字，不能更改"));
                 return 0;
             }
 
             if (!grid_has_value(pt_board, cur_row, cur_col))
                 proc_digit_input(wParam);
-            else if (at_grid[cur_row][cur_col].input_by_user &&
-                wParam != grid_value(pt_board, cur_row, cur_col))
+            else if (wParam != grid_value(pt_board, cur_row, cur_col))
                 proc_modify_input(wParam);
 
             return 0 ;

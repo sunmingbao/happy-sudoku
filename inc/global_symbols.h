@@ -77,6 +77,7 @@ void SaveAsPuzzle(char *file_path);
 void load_puzzle_as_game(char *file_path);
 void LoadArch(char *file_path);
 void game_to_hm_str(char * output);
+void refresh_grid_on_focus();
 extern int display_help;
 extern int display_time;
 extern int play_music;
