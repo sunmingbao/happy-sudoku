@@ -48,6 +48,7 @@
 
 #define ID_FILE_RECENT_FILE_BEGIN    40700
 #define MAX_RECENT_FILE_NUM     10
+#define ID_RECENT_PUZZLE_FILE_BEGIN    40750
 
 #define ID_STAGE_1        40800
 #define MAX_STAGE_NUM     100

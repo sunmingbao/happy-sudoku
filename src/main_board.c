@@ -926,6 +926,7 @@ void load_puzzle_as_game(char *file_path)
     load_puzzle(cur_stage, file_path);
     InitNewGame(cur_stage);
     init_new_game_gui(1);
+    update_sdpzl_file_history(file_path);
 }
 
 void game_to_hm_str(char * output)
@@ -954,18 +955,19 @@ void SaveAsPuzzle(char *file_path)
     char buf[128];
     char buf_2[16]={0};
 
-    FILE *fp = fopen(file_path, "w");
+    FILE *fp = fopen(file_path, "wb");
 
     board_to_input_str(buf, pt_board);
 
     for (i=0; i<MAX_ROW_NUM; i++)
     {
         memcpy(buf_2, buf+i*9, 9);
-        fputs(buf_2, fp);
-        fputs("\n", fp);
+        fwrite(buf_2, 1, 9, fp);
+        fwrite("\r\n", 1, 2, fp);
     }
    
     fclose(fp);
+    update_sdpzl_file_history(file_path);
 
 }
 
@@ -1027,7 +1029,7 @@ void SaveAsArch(char *file_path)
 
 
     fclose(fp);
-    update_file_open_history(file_path);
+    update_arch_file_history(file_path);
 }
 
 void LoadArch(char *file_path)
@@ -1079,7 +1081,7 @@ void LoadArch(char *file_path)
     fclose(fp);
 
     
-    update_file_open_history(file_path);
+    update_arch_file_history(file_path);
 
 }
 

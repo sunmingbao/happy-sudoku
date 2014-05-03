@@ -18,7 +18,9 @@
 
 
 #define    HISTORY_FILE_NAME    "history"
-#define    HISTORY_FILE_NAME_TMP    "history.tmp"
+#define    HISTORY_FILE_TMP    "history.tmp"
+#define    HISTORY_FILE_NAME_SDPZL    ".\\history_sdpzl"
+
 int read_next_filed(FILE *the_file, char *field_name, char *field_value)
 {
     char line[MAX_FILE_PATH_LEN + 32];
@@ -69,21 +71,7 @@ int get_field_value_by_idx(char *file_path
     return ret;
 }
 
-int get_file_path_by_idx(char *file_path, int idx)
-{
-    return get_field_value_by_idx(HISTORY_FILE_NAME
-                        ,idx+1
-                        ,file_path);
-}
-
-int get_last_doc_file(char *file_path)
-{
-    return get_field_value_by_idx(HISTORY_FILE_NAME
-                        ,1
-                        ,file_path);
-}
-
-void populate_recent_files(HMENU	 hMenu)
+void populate_recent_files(HMENU hMenu, int first_menu_item_id, char *history_file_name)
 {
     int i;
     int file_num;
@@ -96,13 +84,13 @@ void populate_recent_files(HMENU	 hMenu)
         DeleteMenu(hMenu, 0, MF_BYPOSITION);
 
 
-    if (!file_exists(HISTORY_FILE_NAME))
+    if (!file_exists(history_file_name))
     {
         //fclose(fopen(HISTORY_FILE_NAME, "w"));
         return;
     }
 
-    history_file = fopen(HISTORY_FILE_NAME, "r");
+    history_file = fopen(history_file_name, "r");
     read_next_filed(history_file, NULL, field_value);
     file_num = atoi(field_value);
 
@@ -110,13 +98,13 @@ void populate_recent_files(HMENU	 hMenu)
     {
         read_next_filed(history_file, NULL, field_value);
         sprintf(menu_name, "&%d  %s", i, field_value);
-        AppendMenu(hMenu, MF_STRING, ID_FILE_RECENT_FILE_BEGIN+i,  menu_name) ;
+        AppendMenu(hMenu, MF_STRING, first_menu_item_id+i,  menu_name) ;
     }
 
     fclose(history_file);
 }
 
-void update_file_open_history(char *file_path)
+void update_file_history(char *file_name, char *history_file_name)
 {
     FILE *history_file_tmp = NULL;
     FILE *history_file = NULL;
@@ -125,19 +113,19 @@ void update_file_open_history(char *file_path)
     int len, i;
     int old_file_num, new_file_num = 1;
 
-    history_file_tmp = fopen(HISTORY_FILE_NAME_TMP, "w");
+    history_file_tmp = fopen(HISTORY_FILE_TMP, "w");
     len=sprintf(field_value
         , "file_num=1  \n"
           "file_0=%s\n"
-          , file_path);
+          , file_name);
     fwrite(field_value, 1, len, history_file_tmp);
 
-    if (!file_exists(HISTORY_FILE_NAME))
+    if (!file_exists(history_file_name))
     {
         goto EXIT;
     }
 
-    history_file = fopen(HISTORY_FILE_NAME, "r");
+    history_file = fopen(history_file_name, "r");
     read_next_filed(history_file, NULL, field_value);
     old_file_num = atoi(field_value);
 
@@ -145,7 +133,7 @@ void update_file_open_history(char *file_path)
     {
 
         read_next_filed(history_file, NULL, field_value);
-        if (0==strcmp(field_value, file_path)) continue;
+        if (0==strcmp(field_value, file_name)) continue;
         len=sprintf(line, "file_%d=%s\n", new_file_num, field_value);
         fwrite(line, 1, len, history_file_tmp);
         new_file_num++;
@@ -162,10 +150,41 @@ EXIT:
     if (history_file != NULL)
     {
         fclose(history_file);
-        delete_file_f(HISTORY_FILE_NAME);
+        delete_file_f(history_file_name);
     }
-    MoveFile(HISTORY_FILE_NAME_TMP, HISTORY_FILE_NAME);
+    MoveFile(HISTORY_FILE_TMP, history_file_name);
 
     
+}
+
+int get_history_arch_file_by_idx(int idx, char *field_value)
+{
+    return get_field_value_by_idx(HISTORY_FILE_NAME, idx, field_value);
+}
+
+void update_arch_file_history(char *file_name)
+{
+    update_file_history(file_name, HISTORY_FILE_NAME);
+}
+
+void populate_recent_arch_files(HMENU hMenu)
+{
+    populate_recent_files(hMenu, ID_FILE_RECENT_FILE_BEGIN, HISTORY_FILE_NAME);
+}
+
+
+int get_history_sdpzl_file_by_idx(int idx, char *field_value)
+{
+    return get_field_value_by_idx(HISTORY_FILE_NAME_SDPZL, idx, field_value);
+}
+
+void update_sdpzl_file_history(char *file_name)
+{
+    update_file_history(file_name, HISTORY_FILE_NAME_SDPZL);
+}
+
+void populate_recent_sdpzl_files(HMENU hMenu)
+{
+    populate_recent_files(hMenu, ID_RECENT_PUZZLE_FILE_BEGIN, HISTORY_FILE_NAME_SDPZL);
 }
 

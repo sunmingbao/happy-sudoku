@@ -14,10 +14,11 @@
 #include <tchar.h> 
 #include <windowsx.h>
 
-int get_last_doc_file(char *file_path);
-void populate_recent_files(HMENU	 hMenu);
-void update_file_open_history(char *file_path);
-int get_file_path_by_idx(char *file_path, int idx);
-
+int get_history_arch_file_by_idx(int idx, char *field_value);
+void update_arch_file_history(char *file_name);
+void populate_recent_arch_files(HMENU hMenu);
+int get_history_sdpzl_file_by_idx(int idx, char *field_value);
+void update_sdpzl_file_history(char *file_name);
+void populate_recent_sdpzl_files(HMENU hMenu);
 #endif
 

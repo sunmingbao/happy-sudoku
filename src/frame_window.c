@@ -52,6 +52,8 @@ void open_file()
         load_puzzle_as_game(file_to_open);
     else if (strstr(file_to_open, ".sdk")!=NULL)
         LoadArch(file_to_open);
+    else
+        WinPrintf(hwnd_frame, TEXT("错误"), TEXT("不支持的文件类型"));
 }
 
 
@@ -93,7 +95,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             DragAcceptFiles(hwnd, TRUE);
 
-    set_frame_title(TEXT("点击选中方格, 单击或用键盘输入数字, 右键标记, ↑↓←→格间移动"));
+    set_frame_title(TEXT("点中方格, 单击/键盘输入数字, 右键标记, ↑↓←→移动"));
 
             //ret=get_last_doc_file(file_to_open);
 
@@ -192,8 +194,13 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 hMenu = GetMenu(hwnd);
                 hMenu = GetSubMenu(hMenu, 0);
-                hMenu = GetSubMenu(hMenu, 7);
-                populate_recent_files(hMenu);
+                hMenu = GetSubMenu(hMenu, 11);
+                populate_recent_arch_files(hMenu);
+                hMenu = GetMenu(hwnd);
+                hMenu = GetSubMenu(hMenu, 0);
+                hMenu = GetSubMenu(hMenu, 12);
+                populate_recent_sdpzl_files(hMenu);
+
             }
 
             return 0;
@@ -451,14 +458,38 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                 case    ID_FILE_RECENT_FILE_BEGIN+8:
                 case    ID_FILE_RECENT_FILE_BEGIN+9:
                 {
-                    get_file_path_by_idx(file_to_open
-                        , item_id - ID_FILE_RECENT_FILE_BEGIN);
+                    get_history_arch_file_by_idx(item_id - ID_FILE_RECENT_FILE_BEGIN+1,
+                        file_to_open);
 
-                    if (file_exists(file_to_open)) LoadArch(file_to_open);
+                    if (file_exists(file_to_open))
+                        LoadArch(file_to_open);
+                    else
+                        WinPrintf(hwnd, TEXT("错误"), TEXT("文件不存在"));
                     return 0 ;
 
                 }
 
+                case    ID_RECENT_PUZZLE_FILE_BEGIN+0:
+                case    ID_RECENT_PUZZLE_FILE_BEGIN+1:
+                case    ID_RECENT_PUZZLE_FILE_BEGIN+2:
+                case    ID_RECENT_PUZZLE_FILE_BEGIN+3:
+                case    ID_RECENT_PUZZLE_FILE_BEGIN+4:
+                case    ID_RECENT_PUZZLE_FILE_BEGIN+5:
+                case    ID_RECENT_PUZZLE_FILE_BEGIN+6:
+                case    ID_RECENT_PUZZLE_FILE_BEGIN+7:
+                case    ID_RECENT_PUZZLE_FILE_BEGIN+8:
+                case    ID_RECENT_PUZZLE_FILE_BEGIN+9:
+                {
+                    get_history_sdpzl_file_by_idx(item_id - ID_RECENT_PUZZLE_FILE_BEGIN+1,
+                        file_to_open);
+
+                    if (file_exists(file_to_open))
+                        load_puzzle_as_game(file_to_open);
+                    else
+                        WinPrintf(hwnd, TEXT("错误"), TEXT("文件不存在"));
+                    return 0 ;
+
+                }
 
             }
 

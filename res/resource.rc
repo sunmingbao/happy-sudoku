@@ -47,20 +47,24 @@ BEGIN
 
     	        MENUITEM "随机生成游戏(&R)", 		             IDM_RAND_GAME
     	        MENUITEM "空棋盘(&E)",                           IDM_EMPTY_GAME
+    	        MENUITEM SEPARATOR
+    	        MENUITEM "打开 存档(&O)...\tCtrl+O", 	 IDM_ARCH_OPEN
+    	        MENUITEM "打开 数独迷题",  IDM_OPEN_PUZZLE
 
     	        MENUITEM SEPARATOR
-    	        
-    	        MENUITEM "当前进度存档(&S)...\tCtrl+S",  IDM_ARCH_SAVE
-    	        MENUITEM "打开存档(&O)...\tCtrl+O", 	 IDM_ARCH_OPEN
+    	        MENUITEM "当前进度 存档(&S)...\tCtrl+S",  IDM_ARCH_SAVE
+    	        MENUITEM "当前进度 存为 数独迷题",  IDM_SAVE_AS_PUZZLE
+    	        MENUITEM SEPARATOR
+
     	        POPUP "最近的存档"
 			    BEGIN
 				    MENUITEM "&1 abc", 	ID_FILE_RECENT_FILE_BEGIN
 			    END
 
-    	        MENUITEM SEPARATOR
-    	        
-    	        MENUITEM "存为 数独迷题",  IDM_SAVE_AS_PUZZLE
-    	        MENUITEM "加载 数独迷题",  IDM_OPEN_PUZZLE
+    	        POPUP "最近的数独迷题"
+			    BEGIN
+				    MENUITEM "&1 abc", 	ID_RECENT_PUZZLE_FILE_BEGIN
+			    END
 
         		MENUITEM SEPARATOR
         		MENUITEM "退出(&X)", 				 IDM_APP_EXIT

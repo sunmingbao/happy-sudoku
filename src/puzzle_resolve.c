@@ -124,6 +124,7 @@ BOOL CALLBACK PuzzleInputDlgProc(HWND hDlg, UINT message,WPARAM wParam, LPARAM l
     char buf[1024];
     char puzzle_file_path[MAX_FILE_PATH_LEN];
     FILE *fp;
+    int ret;
 
     switch (message)
  	{
@@ -146,9 +147,10 @@ BOOL CALLBACK PuzzleInputDlgProc(HWND hDlg, UINT message,WPARAM wParam, LPARAM l
                         if (get_open_file_name(puzzle_file_path, hDlg, " ˝∂¿√‘Ã‚(*.""sdpzl"")\0*.""sdpzl""\0\0"))
                         return 0;
 
-                        fp=fopen(puzzle_file_path,"r");
-                        fread(buf, 1, sizeof(buf),  fp );
+                        fp=fopen(puzzle_file_path,"rb");
+                        ret=fread(buf, 1, sizeof(buf),  fp );
                         fclose(fp);
+                        buf[ret] = 0;
                         SetDlgItemText(hDlg, ID_PUZZLE_INPUT, buf);
                         return TRUE ;
 
