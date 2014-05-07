@@ -130,7 +130,7 @@ BOOL CALLBACK PuzzleInputDlgProc(HWND hDlg, UINT message,WPARAM wParam, LPARAM l
  	{
          	case 	WM_INITDIALOG :
                     center_child_win(hwnd_frame, hDlg);
-                    SendMessage(GetDlgItem(hDlg, ID_PUZZLE_INPUT), WM_SETFONT, (WPARAM)h_font_32_px, 0);
+                    SendMessage(GetDlgItem(hDlg, ID_PUZZLE_INPUT), WM_SETFONT, (WPARAM)h_font_resolve, 0);
                     SetDlgItemText(hDlg, ID_PUZZLE_INPUT, puzzle_to_resolve_hm);
               		return FALSE ;
 
@@ -145,13 +145,13 @@ BOOL CALLBACK PuzzleInputDlgProc(HWND hDlg, UINT message,WPARAM wParam, LPARAM l
       		        case    ID_IMPORT_FROM_FILE:
                     {
                         if (get_open_file_name(puzzle_file_path, hDlg, " ˝∂¿√‘Ã‚(*.""sdpzl"")\0*.""sdpzl""\0\0"))
-                        return 0;
+                        return TRUE;
 
-                        fp=fopen(puzzle_file_path,"rb");
-                        ret=fread(buf, 1, sizeof(buf),  fp );
-                        fclose(fp);
-                        buf[ret] = 0;
-                        SetDlgItemText(hDlg, ID_PUZZLE_INPUT, buf);
+                        if (puzzle_file_to_input_str(hDlg, buf, puzzle_file_path))
+                            return TRUE;
+                        
+                        input_str_to_hm_str(puzzle_to_resolve_hm, buf);
+                        SetDlgItemText(hDlg, ID_PUZZLE_INPUT, puzzle_to_resolve_hm);
                         return TRUE ;
 
 

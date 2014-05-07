@@ -890,18 +890,27 @@ void toolbar_redo_undo_init()
 
 }
 
-void load_puzzle(char *output, char *file_path)
+int puzzle_file_to_input_str(HWND hparent, char *output, char *file_path)
 {
     char buf[128]={0};
     int cnt = 0;
     char *pchar;
 
     FILE *fp=fopen(file_path,"r");
-    if (NULL==fp) return;
+    if (NULL==fp) 
+    {
+        WinPrintf(hparent, "错误", "打开迷题文件 %s 失败", file_path);
+        return 1;
+    }
 
     while (cnt<81)
     {
-        fgets(buf, sizeof(buf), fp);
+        if (fgets(buf, sizeof(buf), fp)==NULL)
+        {
+            WinPrintf(hparent, "错误", "迷题文件 %s 内容非法", file_path);
+            fclose(fp);
+            return 1;
+        }
         pchar = buf;
         while ((*pchar)!=0)
         {
@@ -916,37 +925,50 @@ void load_puzzle(char *output, char *file_path)
 
     output[cnt] = 0;
     fclose(fp);
+    return 0;
 
 }
 
 void load_puzzle_as_game(char *file_path)
 {
+    if (puzzle_file_to_input_str(hwnd_frame, cur_stage, file_path))
+        return;
+    
     game_mode=UsrLoadMode;
     game_over=0;
-    load_puzzle(cur_stage, file_path);
+    
     InitNewGame(cur_stage);
     init_new_game_gui(1);
     update_sdpzl_file_history(file_path);
 }
 
-void game_to_hm_str(char * output)
+void input_str_to_hm_str(char * output, char *input)
 {
     int i;
-    char buf[128];
+
     char buf_2[16] = {0};
     output[0] = 0;
 
     buf_2[9] = '\r';
     buf_2[10] = '\n';
 
-    board_to_input_str(buf, pt_board);
+
 
     for (i=0; i<MAX_ROW_NUM; i++)
     {
-        memcpy(buf_2, buf+i*9, 9);
+        memcpy(buf_2, input+i*9, 9);
         strcat(output, buf_2);
     }
 
+}
+
+void game_to_hm_str(char * output)
+{
+    char buf[128];
+
+    board_to_input_str(buf, pt_board);
+    
+    input_str_to_hm_str(output, buf);
 }
 
 void SaveAsPuzzle(char *file_path)
@@ -1299,22 +1321,34 @@ LRESULT CALLBACK main_board_WndProc (HWND hwnd, UINT message, WPARAM wParam, LPA
             {
                 case VK_LEFT:
                 {
-                    if (cur_col>0) cur_col-=1;
+                    if (cur_col>0) 
+                        cur_col-=1;
+                    else
+                        cur_col=8;
                     break;
                 }
                 case VK_RIGHT:
                 {
-                    if (cur_col<8) cur_col+=1;
+                    if (cur_col<8) 
+                        cur_col+=1;
+                    else
+                        cur_col=0;
                     break;
                 }
                 case VK_UP:
                 {
-                    if (cur_row>0) cur_row-=1;
+                    if (cur_row>0) 
+                        cur_row-=1;
+                    else
+                        cur_row=8;
                     break;
                 }
                 case VK_DOWN:
                 {
-                    if (cur_row<8) cur_row+=1;
+                    if (cur_row<8) 
+                        cur_row+=1;
+                    else
+                        cur_row=0;
                     break;
                 }
 

@@ -111,7 +111,7 @@ void fw_text_out_middle_trans(HDC hdc, RECT *rect, int height
 }
 
 
-HFONT  create_font(int height)
+HFONT  create_font(int height, const char *font_name)
 {
     HFONT  h_font;
     LOGFONT lf ;
@@ -123,14 +123,18 @@ HFONT  create_font(int height)
     lf.lfPitchAndFamily = FIXED_PITCH;
     lf.lfWeight  = FW_BLACK;
 
+    if (NULL != font_name)
+        strcpy(lf.lfFaceName, font_name);
+
     
     h_font = CreateFontIndirect(&lf);
 
     return h_font;
 }
 
-HFONT h_font_32_px;
+HFONT h_font_32_px, h_font_resolve;
 void create_app_fonts()
 {
-    h_font_32_px = create_font(32);
+    h_font_32_px = create_font(32, NULL);
+    h_font_resolve = create_font(40, "Courier New");
 }
