@@ -26,10 +26,11 @@
 
 #define IDM_SUDOKU_SOLVER         40013
 
+#define IDM_USER_MANUAL            40014
 #define IDM_GET_NEW_VERSION        40015
 #define IDM_OPEN_OFFICIAL_SITE     40016
 #define IDM_GET_SOURCE             40017
-#define IDM_APP_HELP               40018
+#define IDM_NEW_VERSION_NOTICE     40018
 #define IDM_APP_ABOUT              40019
 
 #define IDM_SOUND               40020
@@ -59,3 +60,7 @@
 #define ID_PUZZLE_INPUT              (41002)
 #define ID_IMPORT_FROM_FILE          (41003)
 #define ID_INT_LIST_COMB             (41004)
+
+#define ID_VER_UPDATE_CLOSE_BUTTON   41101
+#define ID_VER_UPDATE_NONEED_NOTICE  41102
+

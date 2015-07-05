@@ -102,9 +102,13 @@ BEGIN
     	
     	POPUP "帮助(&H)"
     	BEGIN
+    	    	MENUITEM "操作说明",            IDM_USER_MANUAL
+        	    MENUITEM SEPARATOR
         	    MENUITEM "获取新版本...",	    IDM_GET_NEW_VERSION
         	    MENUITEM "获取源代码...",	    IDM_GET_SOURCE
         	    MENUITEM "访问官方站点...",	    IDM_OPEN_OFFICIAL_SITE
+        	    MENUITEM SEPARATOR
+        	    MENUITEM "有新版本提示我",      IDM_NEW_VERSION_NOTICE, CHECKED
         	    MENUITEM SEPARATOR
         	    MENUITEM "关于本软件...(&A)",	IDM_APP_ABOUT
     	END

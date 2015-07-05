@@ -56,6 +56,15 @@ void open_file()
         WinPrintf(hwnd_frame, TEXT("错误"), TEXT("不支持的文件类型"));
 }
 
+void load_app_profile()
+{
+    HMENU hMenu = GetMenu(hwnd_frame);
+
+    GetPrivateProfileString("update", "new_version_notice", "yes"
+        , new_version_notice, ARRAY_SIZE(new_version_notice), APP_PROFILE_FILE);
+    CheckMenuItem (hMenu, IDM_NEW_VERSION_NOTICE
+    , (strcmp(new_version_notice, "yes")==0)?MF_CHECKED:MF_UNCHECKED) ;
+}
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -73,6 +82,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         case WM_CREATE:
             hwnd_frame = hwnd;
+            load_app_profile();
 
             hwndTip =CreateWindowEx(NULL, TOOLTIPS_CLASS, NULL,
                         WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP |TTS_BALLOON,
@@ -109,7 +119,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                 hwnd, NULL, g_hInstance, NULL) ;
 
             ShowWindow (hwnd_tip, 0) ;
-
+launch_thread(ver_update, NULL);
             return 0 ;
 
 
@@ -212,9 +222,12 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 EnableMenuItem ((HMENU) wParam, IDT_TOOLBAR_UNDO, can_un_do() ? MF_ENABLED : MF_GRAYED);
                 EnableMenuItem ((HMENU) wParam, IDT_TOOLBAR_REDO, can_re_do() ? MF_ENABLED : MF_GRAYED);
-
                 return 0;
-
+            }
+            else if (lParam == 4)
+            {
+                EnableMenuItem ((HMENU) wParam, IDM_USER_MANUAL, MF_GRAYED);
+                return 0;
             }
 
             break;
@@ -247,7 +260,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                 case    IDM_GET_SOURCE:
                 ShellExecute(NULL, "open"
-                    , "http://sourceforge.net/projects/happy-sudoku/files/v2.x/"
+                    , "http://sourceforge.net/p/happy-sudoku/code/ci/master/tree/"
                     , NULL, NULL, SW_SHOWNORMAL);
 
                	return 0 ;
@@ -381,6 +394,23 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
        				return 0 ;
                 }
 
+                case    IDM_NEW_VERSION_NOTICE:
+                    if (strcmp(new_version_notice, "no")==0)
+                    {
+                        strcpy(new_version_notice, "yes");
+                        CheckMenuItem (hMenu, IDM_NEW_VERSION_NOTICE, MF_CHECKED) ;
+                        delete_file_f(VER_UPDATE_NOTICE_RCD);
+                        launch_thread(ver_update, NULL);
+                    }
+                    else
+                    {
+                        strcpy(new_version_notice, "no");
+                        CheckMenuItem (hMenu, IDM_NEW_VERSION_NOTICE, MF_UNCHECKED) ;
+                    }
+                    WritePrivateProfileString("update", "new_version_notice", new_version_notice, APP_PROFILE_FILE);
+
+       		        return 0 ;
+                    
                 case    IDT_TOOLBAR_TIMER:
                 {
                     display_time = !display_time;

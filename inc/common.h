@@ -20,6 +20,7 @@
 #include "defs.h"
 #include "app_property.h"
 
+#define    ARRAY_SIZE(array_name)    (sizeof(array_name)/sizeof(array_name[0]))
 
 void add_tip(HWND htip_control, HWND hwnd, TCHAR *tips);
 static inline void refresh_window(HWND hwnd)

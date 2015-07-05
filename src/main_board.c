@@ -29,15 +29,6 @@ int play_music = 1;
 
 static int win_size, grid_size, big_font_size, small_font_size;
 
-#define    COLOUR_NO_VALUE         RGB(0x55,0xaa,0x55)
-#define    COLOUR_HAS_VALUE        RGB(0xdd,0x92,0x22)
-#define    COLOUR_INPUT_BY_USER    RGB(0xcc,0x55,0xcc)
-#define    COLOUR_ON_FOCUS         RGB(0x99,0x00,0x00)
-
-#define    COLOUR_BLINK_1          RGB(0x00,0x00,0x00)
-#define    COLOUR_BLINK_2          RGB(0xff,0xff,0xff)
-
-#define    COLOR_MARK_DIGIT        RGB(0xff,0xff,0xff)
 
 HBRUSH hBrush_NO_VALUE, hBrush_HAS_VALUE, hBrush_INPUT_BY_USER, hBrush_ON_FOCUS;
 HBRUSH hBrush_BLINK_1, hBrush_BLINK_2;
@@ -61,15 +52,6 @@ typedef struct
 } t_roll_back_q;
 t_roll_back_q gt_rb_q;
 
-typedef struct
-{
-    HWND hwnd;
-    int  row;
-    int  col;
-    int  input_by_user;
-    char mark[MAX_DIGIT_NUM+2];
-    HBRUSH hBrush;
-}t_grid_info;
 
 t_grid_info at_grid[9][9];
 
@@ -404,7 +386,7 @@ void unfocus_any_grid()
     int old_row = cur_row;
     int old_col = cur_col;
 
-    ShowWindow(hwnd_input_board, 0);
+    hide_input_mark_win();
 
     cur_row=-1;
     cur_col=-1;
@@ -433,7 +415,7 @@ void focus_grid(int row, int col)
     //if (GetFocus()!=at_grid[cur_row][cur_col].hwnd)
         //SetFocus(at_grid[cur_row][cur_col].hwnd);
 
-    ShowWindow(hwnd_input_board, 0);
+    hide_input_mark_win();
 
     if (grid_pos_valid(old_row, old_col))
         refresh_grid(old_row,old_col);
@@ -762,10 +744,9 @@ LRESULT CALLBACK grid_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
             
             EndPaint (hwnd, &ps) ;
 
-            if (grid_on_focus(row, col) && 
-                IsWindowVisible(hwnd_input_board)) 
+            if (grid_on_focus(row, col)) 
             {
-                refresh_window(hwnd_input_board);
+                refresh_input_mark_win();
             }
             return 0 ;
         }
@@ -777,8 +758,7 @@ LRESULT CALLBACK grid_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
             {
                 focus_grid(row, col);
             }
-            else if ((pt_grid_info->input_by_user) && 
-                !IsWindowVisible(hwnd_input_board))
+            else if ((pt_grid_info->input_by_user))
             {
                 display_input_win(row, col);
             }
@@ -788,8 +768,7 @@ LRESULT CALLBACK grid_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
 
         case WM_LBUTTONDBLCLK:
         {
-            if ((pt_grid_info->input_by_user) && 
-                !IsWindowVisible(hwnd_input_board))
+            if ((pt_grid_info->input_by_user))
             {
                 display_input_win(row, col);
             }
@@ -804,8 +783,7 @@ LRESULT CALLBACK grid_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
                 focus_grid(row, col);
             }
             
-            if ((pt_grid_info->input_by_user) && 
-                !IsWindowVisible(hwnd_input_board))
+            if ((pt_grid_info->input_by_user))
             {
                 display_mark_win(row, col);
             }
@@ -1186,6 +1164,12 @@ LRESULT CALLBACK main_board_WndProc (HWND hwnd, UINT message, WPARAM wParam, LPA
                     CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,
                     hwnd, NULL, g_hInstance, NULL) ;
 
+            hwnd_mark_board = CreateWindow (szMarkBoardWinClassName, TEXT ("mark_board"),
+                    WS_CHILD,
+                    CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,
+                    hwnd, NULL, g_hInstance, NULL) ;
+
+            hide_input_mark_win();
             InitGrids();
 
             hBrush_NO_VALUE = CreateSolidBrush (COLOUR_NO_VALUE) ;
@@ -1242,8 +1226,7 @@ LRESULT CALLBACK main_board_WndProc (HWND hwnd, UINT message, WPARAM wParam, LPA
 
             }
 
-            if (IsWindowVisible(hwnd_input_board))
-                mov_input_win_to_grid(cur_row, cur_col);
+            mov_input_mark_win_to_grid(cur_row, cur_col);
 
             return 0 ;
         }
@@ -1256,7 +1239,7 @@ LRESULT CALLBACK main_board_WndProc (HWND hwnd, UINT message, WPARAM wParam, LPA
 
         case WM_CHAR:
         {
-            ShowWindow(hwnd_input_board, 0);
+            hide_input_mark_win();
             if (no_grid_on_focus())
             {
                 play_sound_async(TEXT("sd_notify"),  SND_RESOURCE);
@@ -1296,7 +1279,7 @@ LRESULT CALLBACK main_board_WndProc (HWND hwnd, UINT message, WPARAM wParam, LPA
         case WM_KEYDOWN:
         {
             int old_row = cur_row, old_col = cur_col;
-            ShowWindow(hwnd_input_board, 0);
+            hide_input_mark_win();
 
             switch (wParam)
             {

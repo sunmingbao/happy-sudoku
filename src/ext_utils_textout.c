@@ -111,7 +111,7 @@ void fw_text_out_middle_trans(HDC hdc, RECT *rect, int height
 }
 
 
-HFONT  create_font(int height, const char *font_name)
+static HFONT  create_font(int height, const char *font_name)
 {
     HFONT  h_font;
     LOGFONT lf ;
